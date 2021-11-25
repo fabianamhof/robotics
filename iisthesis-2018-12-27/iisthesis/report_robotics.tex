@@ -7,7 +7,7 @@
 
 % \usepackage[ngerman]{babel}     % if the thesis is written in German
 
-\title{IIS Thesis Instructions}
+\title{Rotating Table Task with Reconfigurable Behavior Trees}
 \author{Fabian Amhof \\ Matteo Quaratino}
 \supervisor{Dr. Matteo Saveriano}
 %\supervisor{Firstname1 Lastname1\\ Firstname2 Lastname2}
@@ -16,15 +16,19 @@
 \begin{document}
 \maketitle
 \tableofcontents
+\label{chap:declare}
 
 \chapter{Introduction}
+In this project we have a rotating table with an Object on it. The task is to grab this object with a "Franka Emika Panda Robot", pick it up, and then place it again on the table. It was provided some work from last years course, where the basic functionality is already implemented. So the robot already grabs already the object and places it again on the table but he does it in a way that can be improved in many terms.
+This implementation does not estimate the table velocity, they only have hardcoded some static offset to the objects position. Because of that the robot failed some times when he tried to grab the cube. 
+
 \chapter{Improvements}
 \label{improvements}
 
 \section{Control Robot by ROS-node on external machine}
 \label{separate_node}
 We propose to control the robot with a ROS-node on a external machine. 
-
+We think that it is more flexible, so you can easily change the rosnode to reconfigure the robots behaviour without changing the scripts on the robot itself. In addition to that an external node allows 
 
 \section{Estimate Table Velocity}
 \label{estimate_velocity}
@@ -42,8 +46,29 @@ If all goes well, a option to reposition a misaligned cube could also be impleme
 
 \section{Implement RBT}
 \label{implement_rbt}
+That highlevel desicion making, for example if the robot should move its arm or try to grab something, can be done with behaviour trees or reconfigurable behaviour trees.
+Reconfigurable behaviour trees are an extention of standard behaviour trees and provide a more dynamic and resource-saving approach to represent a task.
+We will use RBT to plan the actions the robot should make in order to execute the task successfully. RBTs can execute different BT based on the priority of each subtask. The priority gets influenced by sensory data or states.
+Based on the following parameters we would like to change priority of the different subtasks. Each subtask is represented in its own BT.
+\begin{center}
+    \begin{tabular}{ |c|c||c|  }
+        \hline
+        Object in reach & Object grabbed & Priorized Task \\
+        \hline
+        \hline
+        False & False & Wait \\
+        False & True & *Not possible* \\
+        True & False & Grab Object \\ 
+        True & True & Place Object on Table \\
+        \hline
+    \end{tabular}
+\end{center}
+
+Since this is a relatively easy task it would be also easy to represent it with a normal BT. However when we use a RBT the table above would be a way how to deal with priorities. Another way is to just consider the distance of the object in the priority function and use the parameter "object grabbed" as precondition for the task "Place Object on Table".
+Therefore if the object is not in reach the robots executes the "wait" task and when the object is in reach the instanciator first checks if the condition "object grabbed" is set. If it is set, then "Place Object on Table" gets executed, if not then "Grab Object" gets executed.
 
 \section{Use Camera to detect Cube [OPTIONAL]}
 \label{use_camera}
+Another thing that could be improved is the recognition of the object. At the moment, thanks to the simulation, we know the position of the object and so we dont have to recognize it. In the real world however we need some sensor to determinate the position and orientation of the object that we need to pick up. For this one could use a camera and then, based on the position of the camera and the image check where the object lies on the table.
 
 \end{document}
