@@ -36,9 +36,11 @@
 \newif\ifbachelor\bachelorfalse
 \newif\ifmaster\masterfalse
 \newif\ifphd\phdfalse
+\newif\ifreport\reportfalse
 \DeclareOption{bachelor}{\bachelortrue}
 \DeclareOption{master}{\mastertrue}
 \DeclareOption{phd}{\phdtrue}
+\DeclareOption{report}{\reporttrue}
 %
 % All other options:
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
@@ -351,6 +353,7 @@
     \def\institutename{~}
     \def\researchgroupname{~}
     \ifbachelor\def\@thesis{Bachelorarbeit}\fi
+    \ifreport\def\@thesis{Report}\fi
     \ifmaster\def\@thesis{Masterarbeit}\fi
     \ifphd\def\@thesis{Ph.D.~Dissertation}\fi
     \def\@supervisortitle{Betreuer}
@@ -360,6 +363,7 @@
     \def\institutename{~}
     \def\researchgroupname{~}
     \ifbachelor\def\@thesis{B.Sc.~Thesis}\fi
+    \ifreport\def\@thesis{Report}\fi
     \ifmaster\def\@thesis{M.Sc.~Thesis}\fi
     \ifphd\def\@thesis{Ph.D.~Dissertation}\fi
     \def\@supervisortitle{Supervisor}
