@@ -6,4 +6,8 @@
 *.lot
 *.out
 *.toc
+*.fls
+*.fdb_latexmk
+*.gz
+
 readme.pdf
