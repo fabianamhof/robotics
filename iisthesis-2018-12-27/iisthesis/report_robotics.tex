@@ -19,15 +19,31 @@
 
 \chapter{Introduction}
 \chapter{Improvements}
+\label{improvements}
 
 \section{Control Robot by ROS-node on external machine}
+\label{separate_node}
+We propose to control the robot with a ROS-node on a external machine. 
+
 
 \section{Estimate Table Velocity}
+\label{estimate_velocity}
+In the example we were given the robot arm does not adjust its movement in relation to the speed at which the table 
+turns. The timing and movement speed is hardcoded, and so is the speed of the table. \\
+We want to work on this by letting the arm adjust its movement dynamically to the table speed.
 
 \section{Improve Grabbing Capabillities}
+\label{improve_grabbing}
+The grabbing motion of the current implementation is reliant on the table turn speed being a specific and constant value, since it's hardcoded. If it varies even by the slightest bit
+the arm could potenionally run into problems and for example push the cube off the table, ideally this should not happen at all. \\
+We want it to react accordingly by building on \ref{estimate_velocity}, assuming that a faster cube is harder to grasp, it might be necessary to define another grabbing motion 
+or at least change it for different situations, like a uneven speed of the table. \\
+If all goes well, a option to reposition a misaligned cube could also be implemented.
 
 \section{Implement RBT}
+\label{implement_rbt}
 
 \section{Use Camera to detect Cube [OPTIONAL]}
+\label{use_camera}
 
 \end{document}
