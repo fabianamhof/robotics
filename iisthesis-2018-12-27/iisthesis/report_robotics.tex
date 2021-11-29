@@ -69,9 +69,9 @@ Based on the following parameters we would like to change priority of the differ
 Since this is a relatively easy task it would be also easy to represent it with a normal BT. However when we use a RBT the table above would be a way how to deal with priorities. Another way is to just consider the distance of the object in the priority function and use the parameter "object grabbed" as precondition for the task "Place Object on Table".
 Therefore if the object is not in reach the robots executes the "wait" task and when the object is in reach the instanciator first checks if the condition "object grabbed" is set. If it is set, then "Place Object on Table" gets executed, if not then "Grab Object" gets executed.
 
-\section{Use Camera to detect Cube [OPTIONAL]}
-\label{use_camera}
-Another thing that could be improved is the recognition of the object. At the moment, thanks to the simulation, we know the position of the object and so we dont have to recognize it. In the real world however we need some sensor to determinate the position and orientation of the object that we need to pick up. For this one could use a camera and then, based on the position of the camera and the image check where the object lies on the table. \\
-We would like to focus on the previous points and add this feature only when we're satisfied with section \ref{separate_node} to \ref{implement_rbt}. 
+%\section{Use Camera to detect Cube [OPTIONAL]}
+%\label{use_camera}
+%Another thing that could be improved is the recognition of the object. At the moment, thanks to the simulation, we know the position of the object and so we dont have to recognize it. In the real world however we need some sensor to determinate the position and orientation of the object that we need to pick up. For this one could use a camera and then, based on the position of the camera and the image check where the object lies on the table. \\
+%We would like to focus on the previous points and add this feature only when we're satisfied with section \ref{separate_node} to \ref{implement_rbt}. 
 
 \end{document}

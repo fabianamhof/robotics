@@ -1,0 +1,20 @@
+[
+  {
+    "name":"rbt_root",
+    "type":"Fallback",
+    "children": ["A(Actionnodes.conditions.goalReached.Condition(goal_reached))" ,"parallel_1"],
+    "params": []
+  },
+  {
+    "name":"parallel_1",
+    "type":"Parallel",
+    "children": ["A(Actionnodes.actions.handlePriorityBasic.Action(handle_priority))","fallback_1"],
+    "params": []
+  },
+  {
+    "name":"fallback_1",
+    "type":"Fallback",
+    "children": ["A(Actionnodes.actions.idle.Action(swap_subtree))", "A(Actionnodes.actions.idle.Action(execute_subtree))"],
+    "params": ["C_11", "Actionnodes.conditions.priorityChangedSleepFail.Condition(priority_changed)"]
+  }
+]

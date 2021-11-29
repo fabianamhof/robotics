@@ -1,0 +1,13 @@
+[
+  {
+    "name":"2_root",
+    "type":"Fallback",
+    "children": [
+      {
+        "kind": "Action",
+        "package":  "idle",
+        "name": "tree2"}
+    ],
+    "params": []
+  }
+]
