@@ -43,6 +43,7 @@ The grabbing motion of the current implementation is reliant on the table turn s
 the arm could potenionally run into problems and for example push the cube off the table, ideally this should not happen at all. \\
 We want it to react accordingly by building on \ref{estimate_velocity}, assuming that a faster cube is harder to grasp, it might be necessary to define another grabbing motion 
 or at least change it for different situations, like a uneven speed of the table. \\
+In the given implementation the gripper does not rotate according to the alignment of the cube. The robot is not using joint number 7, which is responsible for the rotation of the gripper, we would like to try to allow the arm to adjust the angle of the gripper accordingly.
 If all goes well, a option to reposition a misaligned cube could also be implemented.
 
 \section{Implement RBT}
