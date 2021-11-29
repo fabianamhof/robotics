@@ -28,7 +28,8 @@ This implementation does not estimate the table velocity, they only have hardcod
 \section{Control Robot by ROS-node on external machine}
 \label{separate_node}
 We propose to control the robot with a ROS-node on a external machine. 
-We think that it is more flexible, so you can easily change the rosnode to reconfigure the robots behaviour without changing the scripts on the robot itself. In addition to that an external node allows 
+We think that it is more flexible, so you can easily change the ROS-node to reconfigure the robots behaviour without changing the scripts on the robot itself. In addition to that an external node allows we can write full-fledged software and not just
+some scripts, expecially in regard to the RBT it's beneficial
 
 \section{Estimate Table Velocity}
 \label{estimate_velocity}
@@ -69,6 +70,7 @@ Therefore if the object is not in reach the robots executes the "wait" task and 
 
 \section{Use Camera to detect Cube [OPTIONAL]}
 \label{use_camera}
-Another thing that could be improved is the recognition of the object. At the moment, thanks to the simulation, we know the position of the object and so we dont have to recognize it. In the real world however we need some sensor to determinate the position and orientation of the object that we need to pick up. For this one could use a camera and then, based on the position of the camera and the image check where the object lies on the table.
+Another thing that could be improved is the recognition of the object. At the moment, thanks to the simulation, we know the position of the object and so we dont have to recognize it. In the real world however we need some sensor to determinate the position and orientation of the object that we need to pick up. For this one could use a camera and then, based on the position of the camera and the image check where the object lies on the table. \\
+We would like to focus on the previous points and add this feature only when we're satisfied with section \ref{separate_node} to \ref{implement_rbt}. 
 
 \end{document}
