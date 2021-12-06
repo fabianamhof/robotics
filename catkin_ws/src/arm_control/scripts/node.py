@@ -26,10 +26,11 @@ def calculate_target_pos(cube_pos):
 def callback(data):
     global robot_state
     global step
+    printState(data, robot_state)
     if step == 0:
         if data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1 and robot_state.data == 1:
             #print("\n MOVING ROBOT \n")
-            print("Step %d, Moving Robot", step)
+            rospy.loginfo("Step %d, Moving Robot", step)
             printState(data, robot_state)
             pub.publish(calculate_target_pos(data))
             step += 1
@@ -44,6 +45,7 @@ def callback(data):
             step += 1
     if step == 2:
         if not (data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1):
+            print("Step = 0, restarting")
             step = 0
         
 
