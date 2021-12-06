@@ -17,16 +17,12 @@ def printState(position, robot_state):
     print("\n")
 
 def calculate_target_pos(cube_pos):
-    intermediate_point = cube_pos
-    intermediate_point.x += 0.1
-    intermediate_point.y += 0.1
-
-    return intermediate_point
+    return Point(cube_pos.x + 0.1, cube_pos.y + 0.1, cube_pos.z)
 
 def callback(data):
     global robot_state
     global step
-    printState(data, robot_state)
+    #printState(data, robot_state)
     if step == 0:
         if data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1 and robot_state.data == 1:
             #print("\n MOVING ROBOT \n")
@@ -34,7 +30,7 @@ def callback(data):
             printState(data, robot_state)
             pub.publish(calculate_target_pos(data))
             step += 1
-    if step == 1:
+    elif step == 1:
         if data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1 and robot_state.data == 1:
             #print("\n MOVING ROBOT \n")
             rospy.loginfo("Step %d, Moving Robot", step)
@@ -43,7 +39,7 @@ def callback(data):
             print("\n")
             pub.publish(data)
             step += 1
-    if step == 2:
+    elif step == 2:
         if not (data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1):
             print("Step = 0, restarting")
             step = 0
