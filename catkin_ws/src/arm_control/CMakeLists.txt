@@ -201,7 +201,7 @@ include_directories(
 # endif()
 
 ## Add folders to be run by python nosetests
-catkin_install_python(PROGRAMS scripts/subscriber.py
+catkin_install_python(PROGRAMS scripts/node.py
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 # catkin_add_nosetests(test)
 
