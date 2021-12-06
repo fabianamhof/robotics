@@ -2,16 +2,13 @@
 import rospy
 from geometry_msgs.msg import Point
 from std_msgs.msg import String
+from std_msgs.msg import Int8
 
 pub = rospy.Publisher('target_pos', Point, queue_size=1000)
 sent = False
-
+step = 0
 
 def calculate_target_pos(cube_pos):
-    max_vel = [0.1,0.1,0.1,0.1]
-    max_accel = [0.02,0.02,0.02,0.02]
-    max_jerk = [0.01,0.01,0.01,0.01]
-
     intermediate_point = cube_pos
     intermediate_point.x += 0.1
     intermediate_point.y += 0.1
@@ -19,23 +16,47 @@ def calculate_target_pos(cube_pos):
     return intermediate_point
 
 def callback(data):
-    
-    # rospy.loginfo(rospy.get_caller_id() + "X: %f", data.x)
-    # rospy.loginfo(rospy.get_caller_id() + "Y: %f", data.y)
-    # rospy.loginfo(rospy.get_caller_id() + "Z: %f", data.z)
-    # print("\n")
-    global sent
-    if data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1:
-        if sent == False:
-            print("test\n")
+    global robot_state
+    global step
+    print(step)
+    if step == 0:
+        if data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1 and robot_state.data == 1:
+            #print("\n MOVING ROBOT \n")
+            rospy.loginfo("Step %d, Moving Robot", step)
+            print("Cube Position")
+            print("X: "+ str(data.x))
+            print("Y: "+ str(data.y))
+            print("Z: "+ str(data.z))
+            print("Robot State " + str(robot_state))
+            print("\n")
             pub.publish(calculate_target_pos(data))
-
-            rospy.sleep(1)
-
+            step += 1
+    if step == 1:
+        if data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1 and robot_state.data == 1:
+            #print("\n MOVING ROBOT \n")
+            rospy.loginfo("Step %d, Moving Robot", step)
+            print("Cube Position")
+            print("X: "+ str(data.x))
+            print("Y: "+ str(data.y))
+            print("Z: "+ str(data.z))
+            print("Robot State " + str(robot_state))
+            print("\n")
             pub.publish(data)
+            step += 1
+    if step == 2:
+        if not (data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1):
+            step = 0
+        
 
-            sent = True
-    
+
+robot_state = Int8(1)
+
+def robotState_callback(data):
+    print("Robot state")
+    print(data)
+    print("\n")
+    global robot_state
+    robot_state = data
     
 def listener():
 
@@ -47,6 +68,7 @@ def listener():
     rospy.init_node('rbt_node', anonymous=True)
 
     rospy.Subscriber("cube_pos", Point, callback)
+    rospy.Subscriber("robot_state", Int8, robotState_callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
