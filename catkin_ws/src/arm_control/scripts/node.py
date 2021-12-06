@@ -8,6 +8,14 @@ pub = rospy.Publisher('target_pos', Point, queue_size=1000)
 sent = False
 step = 0
 
+def printState(position, robot_state):
+    print("Cube Position")
+    print("X: "+ str(position.x))
+    print("Y: "+ str(position.y))
+    print("Z: "+ str(position.z))
+    print("Robot State " + str(robot_state))
+    print("\n")
+
 def calculate_target_pos(cube_pos):
     intermediate_point = cube_pos
     intermediate_point.x += 0.1
@@ -18,17 +26,11 @@ def calculate_target_pos(cube_pos):
 def callback(data):
     global robot_state
     global step
-    print(step)
     if step == 0:
         if data.y > -0.5 and data.y < 0.5 and data.z < 0.6 and data.z > 0.1 and robot_state.data == 1:
             #print("\n MOVING ROBOT \n")
-            rospy.loginfo("Step %d, Moving Robot", step)
-            print("Cube Position")
-            print("X: "+ str(data.x))
-            print("Y: "+ str(data.y))
-            print("Z: "+ str(data.z))
-            print("Robot State " + str(robot_state))
-            print("\n")
+            print("Step %d, Moving Robot", step)
+            printState(data, robot_state)
             pub.publish(calculate_target_pos(data))
             step += 1
     if step == 1:
@@ -36,10 +38,7 @@ def callback(data):
             #print("\n MOVING ROBOT \n")
             rospy.loginfo("Step %d, Moving Robot", step)
             print("Cube Position")
-            print("X: "+ str(data.x))
-            print("Y: "+ str(data.y))
-            print("Z: "+ str(data.z))
-            print("Robot State " + str(robot_state))
+            printState(data, robot_state)
             print("\n")
             pub.publish(data)
             step += 1
@@ -52,9 +51,6 @@ def callback(data):
 robot_state = Int8(1)
 
 def robotState_callback(data):
-    print("Robot state")
-    print(data)
-    print("\n")
     global robot_state
     robot_state = data
     
