@@ -108,6 +108,8 @@ def robotState_callback(data):
 def gripperState_callback(data):
     global gripper_state
     gripper_state = data
+    print("Grippe State: " + str(gripper_state.data))
+
 
 def cubePos_callback(data):
     global cube_pos
