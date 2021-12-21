@@ -11,15 +11,11 @@ class Condition(condition.Condition):
         self.previous = None
         self.name = name
         self.executed = False
-        self.reset = True
 
     def setup(self):
         self.blackboard = py_trees.blackboard.Client(name="priorityChanged")
-        with open("./../json/topics.json") as topicfile:
-            self.topiclist = json.load(topicfile)
-        for topic in self.topiclist:
-            self.blackboard.register_key(key=topic["name"], access=py_trees.common.Access.READ)
-        self.blackboard.register_key(key="subtree", access=py_trees.common.Access.WRITE)
+        self.blackboard.register_key(key="priorityChanged", access=py_trees.common.Access.READ)
+        self.blackboard.register_key(key="priorityChanged", access=py_trees.common.Access.WRITE)
         self.previous = None
         print("priorityChanged; Setup");
 
@@ -28,27 +24,8 @@ class Condition(condition.Condition):
         return
 
     def update(self):
-        # has to be implemented depending on needs
-        cube_pos = self.blackboard.get("cube_pos")
-        gripper_state = self.blackboard.get("gripper_state")
-
-        newTree = self.previous
-        if -0.5 < cube_pos.y < 0.5 and 0.6 > cube_pos.z > 0.1 and self.reset:
-            if gripper_state == Int8(0):
-                newTree = "pickUpTree"
-            else:
-                newTree = "placeDownTree"
-                self.reset = False
-
-        if not (-0.5 < cube_pos.y < 0.5 and 0.6 > cube_pos.z > 0.1):
-            newTree = "waitTree"
-            if not self.reset:
-                self.reset = True
-
-        if newTree != self.previous:
-            self.previous = newTree
-            self.blackboard.set("subtree", newTree)
-            print("priorityChanged; Change Tree to " + newTree)
+        if self.blackboard.priorityChanged:
+            self.blackboard.priorityChanged = False
             return py_trees.common.Status.SUCCESS
         else:
             return py_trees.common.Status.FAILURE

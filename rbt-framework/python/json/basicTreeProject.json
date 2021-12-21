@@ -9,8 +9,8 @@
         "kind": "Condition",
         "package": "goalReached",
         "name": "goal_reached",
-        "position_x": 3644.0,
-        "position_y": 222.0
+        "position_x": 3582.974152781678,
+        "position_y": 237.91978623086652
       },
       {
         "name": "sequence_1",
@@ -22,55 +22,44 @@
   {
     "name": "sequence_1",
     "type": "Sequence",
-    "position_x": 3944.0,
-    "position_y": 222.0,
+    "position_x": 4036.8654196800544,
+    "position_y": 206.08021376913348,
     "children": [
       {
-        "name": "fallback_blackboard",
-        "kind": "Controlflow"
+        "kind": "Action",
+        "package": "initializeBlackboard",
+        "name": "initialize_blackboard",
+        "position_x": 3567.4091456194183,
+        "position_y": 828.5095785334875
       },
       {
         "name": "parallel_1",
         "kind": "Controlflow"
       }
     ],
-    "params": []
-  },
-  {
-    "name": "fallback_blackboard",
-    "type": "Fallback",
-    "position_x": 3644.0,
-    "position_y": 222.0,
-    "children": [
+    "params": [
       {
-        "kind": "Condition",
+        "kind": "Postcondition",
         "package": "initializedBlackboard",
         "name": "blackboard_initialized",
-        "position_x": 3644.0,
-        "position_y": 222.0
-      },
-      {
-        "kind": "Action",
-        "package": "initializeBlackboard",
-        "name": "initialize_blackboard",
-        "position_x": 3644.0,
-        "position_y": 222.0
+        "position_x": 3909.195881455523,
+        "position_y": 830.6786351630326,
+        "conditioned_node": 0
       }
-    ],
-    "params": []
+    ]
   },
   {
     "name": "parallel_1",
     "type": "Parallel",
-    "position_x": 3944.0,
-    "position_y": 222.0,
+    "position_x": 4385.710511009852,
+    "position_y": 424.81551427862905,
     "children": [
       {
         "kind": "Action",
         "package": "handlePriorityBasic",
         "name": "handle_priority",
-        "position_x": 3644.0,
-        "position_y": 422.0
+        "position_x": 4085.710511009853,
+        "position_y": 624.815514278629
       },
       {
         "name": "fallback_1",
@@ -82,15 +71,15 @@
   {
     "name": "fallback_1",
     "type": "Fallback",
-    "position_x": 3944.0,
-    "position_y": 422.0,
+    "position_x": 4385.710511009852,
+    "position_y": 624.815514278629,
     "children": [
       {
         "kind": "Action",
         "package": "changeSubtree",
         "name": "change_subtree",
-        "position_x": 4054.271278886385,
-        "position_y": 862.6619233691086
+        "position_x": 4495.981789896238,
+        "position_y": 1065.4774376477376
       }
     ],
     "params": [
@@ -98,8 +87,8 @@
         "kind": "Precondition",
         "package": "priorityChanged",
         "name": "priorityChanged",
-        "position_x": 3719.382204855498,
-        "position_y": 876.4140332759148,
+        "position_x": 4161.092715865349,
+        "position_y": 1079.2295475545438,
         "conditioned_node": 0
       }
     ]

@@ -11,7 +11,7 @@ class RTReader:
         self.SubList = []
         for topic in self.topicList:
             self.blackboard.register_key(key=topic["name"], access=py_trees.common.Access.WRITE)
-            self.blackboard.set(topic["name"], eval(topic["type"])())
+            self.blackboard.set(topic["name"], eval(topic["init"]))
             self.SubList.append(rospy.Subscriber(topic["name"], eval(topic["type"]), self.callback, topic))
 
 
