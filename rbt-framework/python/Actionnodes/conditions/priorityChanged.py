@@ -7,9 +7,11 @@ from std_msgs.msg import Int8
 class Condition(condition.Condition):
     def __init__(self, name):
         super(Condition, self).__init__(name)
+        self.blackboard = None
         self.previous = None
         self.name = name
         self.executed = False
+        self.reset = True
 
     def setup(self):
         self.blackboard = py_trees.blackboard.Client(name="priorityChanged")
@@ -26,19 +28,22 @@ class Condition(condition.Condition):
         return
 
     def update(self):
-        print("priorityChanged; update")
         # has to be implemented depending on needs
         cube_pos = self.blackboard.get("cube_pos")
         gripper_state = self.blackboard.get("gripper_state")
 
-        newTree = None
-        if -0.5 < cube_pos.y < 0.5 and 0.6 > cube_pos.z > 0.1:
+        newTree = self.previous
+        if -0.5 < cube_pos.y < 0.5 and 0.6 > cube_pos.z > 0.1 and self.reset:
             if gripper_state == Int8(0):
                 newTree = "pickUpTree"
             else:
                 newTree = "placeDownTree"
-        else:
+                self.reset = False
+
+        if not (-0.5 < cube_pos.y < 0.5 and 0.6 > cube_pos.z > 0.1):
             newTree = "waitTree"
+            if not self.reset:
+                self.reset = True
 
         if newTree != self.previous:
             self.previous = newTree

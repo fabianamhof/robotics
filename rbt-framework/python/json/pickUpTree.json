@@ -7,8 +7,8 @@
     "children": [
       {
         "kind": "Action",
-        "package": "calcTargetPos",
-        "name": "Action calcTargetPos",
+        "package": "calcPos",
+        "name": "calcIntermediatePos",
         "position_x": 3086.0,
         "position_y": 283.0
       },
@@ -42,9 +42,30 @@
       },
       {
         "kind": "Action",
+        "package": "controlGripper",
+        "name": "openGripper",
+        "position_x": 3735.2816691460935,
+        "position_y": 757.3845824179689
+      },
+      {
+        "kind": "Action",
         "package": "moveArm",
         "name": "Action moveArm",
-        "position_x": 3435.2816691460935,
+        "position_x": 4135.2816691460935,
+        "position_y": 757.3845824179689
+      },
+      {
+        "kind": "Action",
+        "package": "calcPos",
+        "name": "calcTargetPos",
+        "position_x": 3735.2816691460935,
+        "position_y": 757.3845824179689
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "Action moveArm",
+        "position_x": 4135.2816691460935,
         "position_y": 757.3845824179689
       }
     ],

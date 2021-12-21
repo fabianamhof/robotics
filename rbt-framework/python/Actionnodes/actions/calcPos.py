@@ -1,7 +1,7 @@
 import py_trees
 import action
+
 from geometry_msgs.msg import Point
-from std_msgs.msg import Bool
 
 
 class Action(action.Action):
@@ -19,6 +19,7 @@ class Action(action.Action):
         self.blackboard = None
         self.name = name
         self.executed = False
+
 
     def setup(self):
         """
@@ -49,10 +50,10 @@ class Action(action.Action):
             children have been added or removed
         """
         self.logger.debug("  %s [Foo::setup()]" % self.name)
-        self.blackboard = py_trees.blackboard.Client(name="calcNeutralPos")
+        self.blackboard = py_trees.blackboard.Client(name="calcPos")
         self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.WRITE)
-        self.blackboard.register_key(key="gripperPosition", access=py_trees.common.Access.WRITE)
-        print("calcNeutralPos; Setup")
+        self.blackboard.register_key(key="cube_pos", access=py_trees.common.Access.READ)
+
 
     def initialise(self):
         """
@@ -76,9 +77,20 @@ class Action(action.Action):
           - Set a feedback message
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
-        self.blackboard.targetPosition = Point(0.4, 0.0, 0.4)
-        print("calcNeutralPos; Calculated Neutral Pos")
+        if self.name == "calcTargetPos":
+            self.blackboard.targetPosition = Point(self.blackboard.cube_pos.x , self.blackboard.cube_pos.y, self.blackboard.cube_pos.z)
+        elif self.name == "calcIntermediatePos":
+            self.blackboard.targetPosition = Point(self.blackboard.cube_pos.x + 0.1, self.blackboard.cube_pos.y + 0.1, self.blackboard.cube_pos.z)
+        elif self.name == "calcNeutralPos":
+            self.blackboard.targetPosition = Point(0.4, 0.0, 0.4)
+        elif self.name == "calcPlacingPos":
+            self.blackboard.targetPosition = Point(0.1, 0.2, 0.6)
+        else:
+            self.blackboard.targetPosition = Point(0.4, 0.0, 0.4)
+
+        print(self.name)
         return py_trees.common.Status.SUCCESS
+
 
     def terminate(self, new_status):
         """

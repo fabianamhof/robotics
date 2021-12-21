@@ -16,7 +16,6 @@ class Condition(condition.Condition):
         return
 
     def update(self):
-        time.sleep(2)
         try:
             board = py_trees.blackboard.Client(name="Board")
             board.register_key(key="goalReached", access=py_trees.common.Access.READ)

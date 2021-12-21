@@ -7,8 +7,8 @@
     "children": [
       {
         "kind": "Action",
-        "package": "calcNeutralPos",
-        "name": "Action calcNeutralPos",
+        "package": "calcPos",
+        "name": "calcNeutralPos",
         "position_x": 3881.0,
         "position_y": 268.0
       },

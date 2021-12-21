@@ -57,7 +57,7 @@ class Action(action.Action):
         self.blackboard.register_key(key="robot_state", access=py_trees.common.Access.WRITE)
         self.pub = rospy.Publisher('target_pos', Point, queue_size=1000)
 
-        #rospy.init_node('rbt_node', anonymous=True)
+        # rospy.init_node('rbt_node', anonymous=True)
 
         print("moveArm, Setup")
         return
@@ -84,8 +84,6 @@ class Action(action.Action):
           - Set a feedback message
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
-        print("moveArm; Update")
-
         if self.blackboard.robot_state == Int8(1) and self.published:
             self.published = False
             return py_trees.common.Status.SUCCESS
@@ -96,10 +94,9 @@ class Action(action.Action):
             self.blackboard.set("robot_state", Int8(0))
             self.pub.publish(p)
             self.published = True
+            print("Published Arm position")
 
         return py_trees.common.Status.RUNNING
-
-
 
     def terminate(self, new_status):
         """

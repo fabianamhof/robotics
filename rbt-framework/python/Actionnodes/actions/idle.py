@@ -16,7 +16,7 @@ class Action(action.Action):
         return
 
     def update(self):
-        time.sleep(2)
+        time.sleep(3)
         print("Idle waiting!")
         return py_trees.common.Status.FAILURE
 

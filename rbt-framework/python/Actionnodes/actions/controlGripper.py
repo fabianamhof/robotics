@@ -89,14 +89,12 @@ class Action(action.Action):
           - Set a feedback message
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
-        print("controlGripper; Update")
-
         if self.published:
             if (self.blackboard.gripper_state == Int8(1)) == (self.publishedCommand == Bool(True)):
                 self.published = False
                 return py_trees.common.Status.SUCCESS
             else:
-                if self.publishedTime + 5 < get_time():
+                if self.publishedTime + 2 < get_time():
                     self.published = False
                     return py_trees.common.Status.FAILURE
                 else:

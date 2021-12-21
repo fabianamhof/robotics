@@ -7,8 +7,8 @@
     "children": [
       {
         "kind": "Action",
-        "package": "calcNeutralPos",
-        "name": "Action calcNeutralPos",
+        "package": "calcPos",
+        "name": "calcNeutralPos",
         "position_x": 3415.7029989851553,
         "position_y": 261.84970295859375
       },
@@ -18,8 +18,8 @@
       },
       {
         "kind": "Action",
-        "package": "calcPlacingPos",
-        "name": "Action calcPlacingPos",
+        "package": "calcPos",
+        "name": "calcPlacingPos",
         "position_x": 3915.573974640626,
         "position_y": 261.1065063398438
       },
@@ -74,25 +74,11 @@
         "position_y": 458.29230549453126
       },
       {
-        "kind": "Condition",
-        "package": "robotReady",
-        "name": "Condition robotReady",
-        "position_x": 4621.938386814063,
-        "position_y": 459.6994059171875
-      },
-      {
         "kind": "Action",
         "package": "controlGripper",
         "name": "openGripper",
         "position_x": 4900.5442705000005,
         "position_y": 466.7349080304688
-      },
-      {
-        "kind": "Condition",
-        "package": "gripperOpen",
-        "name": "Condition gripperOpen",
-        "position_x": 5179.150154185938,
-        "position_y": 466.73490803046866
       },
       {
         "kind": "Action",
