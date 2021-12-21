@@ -16,7 +16,8 @@ class Action(action.Action):
         return
 
     def update(self):
-        return py_trees.common.Status.FAILURE
+        time.sleep(3)
+        return py_trees.common.Status.RUNNING
 
 
 
