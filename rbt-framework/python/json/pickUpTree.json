@@ -1,0 +1,113 @@
+[
+  {
+    "name": "Sequence",
+    "type": "Sequence",
+    "position_x": 3390.0,
+    "position_y": 74.0,
+    "children": [
+      {
+        "kind": "Action",
+        "package": "calcTargetPos",
+        "name": "Action calcTargetPos",
+        "position_x": 3086.0,
+        "position_y": 283.0
+      },
+      {
+        "name": "armState",
+        "kind": "Controlflow"
+      },
+      {
+        "name": "closeGripper",
+        "kind": "Controlflow"
+      },
+      {
+        "name": "moveArmUp",
+        "kind": "Controlflow"
+      }
+    ],
+    "params": []
+  },
+  {
+    "name": "armState",
+    "type": "Sequence",
+    "position_x": 3287.2816691460935,
+    "position_y": 548.3845824179689,
+    "children": [
+      {
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady",
+        "position_x": 3185.2816691460935,
+        "position_y": 757.3845824179689
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "Action moveArm",
+        "position_x": 3435.2816691460935,
+        "position_y": 757.3845824179689
+      }
+    ],
+    "params": []
+  },
+  {
+    "name": "closeGripper",
+    "type": "Sequence",
+    "position_x": 4503.592899577344,
+    "position_y": 538.3928710062502,
+    "children": [
+      {
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady2",
+        "position_x": 4307.592899577344,
+        "position_y": 732.3928710062503
+      },
+      {
+        "kind": "Condition",
+        "package": "gripperOpen",
+        "name": "Condition gripperOpen",
+        "position_x": 4552.592899577344,
+        "position_y": 734.3928710062503
+      },
+      {
+        "kind": "Action",
+        "package": "controlGripper",
+        "name": "closeGripper",
+        "position_x": 4806.592899577344,
+        "position_y": 728.3928710062503
+      }
+    ],
+    "params": []
+  },
+  {
+    "name": "moveArmUp",
+    "type": "Sequence",
+    "position_x": 4818.206928996095,
+    "position_y": 250.07929281484377,
+    "children": [
+      {
+        "kind": "Condition",
+        "package": "gripperClosed",
+        "name": "Condition gripperClosed",
+        "position_x": 4781.622318007034,
+        "position_y": 451.4863932375
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "moveArmUp",
+        "position_x": 5105.25541521797,
+        "position_y": 286.8556437867186
+      },
+      {
+        "kind": "Action",
+        "package": "idle",
+        "name": "Action idle",
+        "position_x": 5105.25541521797,
+        "position_y": 286.8556437867186
+      }
+    ],
+    "params": []
+  }
+]

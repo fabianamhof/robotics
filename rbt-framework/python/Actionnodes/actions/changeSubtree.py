@@ -5,12 +5,12 @@ import algorithm
 import traceback
 import json
 
+
 class Action(action.Action):
     def __init__(self, name):
         super(Action, self).__init__(name)
         self.name = name
         self.executed = False
-
 
     def setup(self):
         self.blackboard = py_trees.blackboard.Client(name="changeSubtree")
@@ -28,6 +28,7 @@ class Action(action.Action):
             with open('./../json/' + subtreeName + '.json') as json_file:
                 treeJson = json.load(json_file)
             tree = algorithm.instantiateSubtree(treeJson)
+            tree.setup_with_descendants()
             if not self.prev_subtree:
                 changingNode.add_child(tree)
             else:
@@ -35,14 +36,10 @@ class Action(action.Action):
                 changingNode.add_child(tree)
             self.prev_subtree = changingNode.children[1].id
 
-            return py_trees.common.Status.FAILURE # needs to be reevaluted alle the time
+            return py_trees.common.Status.FAILURE  # needs to be reevaluted alle the time
         except Exception as e:
             traceback.print_exception(Exception, e, e.__traceback__)
-            return py_trees.common.Status.FAILURE
-
-
-
-
+            return py_trees.common.Status.SUCCESS
 
     def terminate(self, new_status):
         return

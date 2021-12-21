@@ -1,0 +1,39 @@
+[
+  {
+    "name": "Sequence",
+    "type": "Sequence",
+    "position_x": 4112.0,
+    "position_y": 38.0,
+    "children": [
+      {
+        "kind": "Action",
+        "package": "calcNeutralPos",
+        "name": "Action calcNeutralPos",
+        "position_x": 3881.0,
+        "position_y": 268.0
+      },
+      {
+        "kind": "Action",
+        "package": "controlGripper",
+        "name": "openGripper",
+        "position_x": 4297.0,
+        "position_y": 499.0
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "Action moveArm",
+        "position_x": 4414.0,
+        "position_y": 268.0
+      },
+      {
+        "kind": "Action",
+        "package": "idle",
+        "name": "Action idle",
+        "position_x": 5105.25541521797,
+        "position_y": 286.8556437867186
+      }
+    ],
+    "params": []
+  }
+]

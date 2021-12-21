@@ -1,0 +1,114 @@
+[
+  {
+    "name": "Sequence",
+    "type": "Sequence",
+    "position_x": 3663.7029989851553,
+    "position_y": 49.84970295859375,
+    "children": [
+      {
+        "kind": "Action",
+        "package": "calcNeutralPos",
+        "name": "Action calcNeutralPos",
+        "position_x": 3415.7029989851553,
+        "position_y": 261.84970295859375
+      },
+      {
+        "name": "armState",
+        "kind": "Controlflow"
+      },
+      {
+        "kind": "Action",
+        "package": "calcPlacingPos",
+        "name": "Action calcPlacingPos",
+        "position_x": 3915.573974640626,
+        "position_y": 261.1065063398438
+      },
+      {
+        "name": "Sequence_0",
+        "kind": "Controlflow"
+      }
+    ],
+    "params": []
+  },
+  {
+    "name": "armState",
+    "type": "Sequence",
+    "position_x": 3667.7029989851553,
+    "position_y": 259.84970295859375,
+    "children": [
+      {
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady",
+        "position_x": 3553.7278647499998,
+        "position_y": 464.0710042265626
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "Action moveArm",
+        "position_x": 3799.970438714842,
+        "position_y": 461.25680338125
+      }
+    ],
+    "params": []
+  },
+  {
+    "name": "Sequence_0",
+    "type": "Sequence",
+    "position_x": 4166.037849873438,
+    "position_y": 258.2923054945312,
+    "children": [
+      {
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady",
+        "position_x": 4087.240226204688,
+        "position_y": 456.88520507187496
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "Action moveArm",
+        "position_x": 4364.439009467968,
+        "position_y": 458.29230549453126
+      },
+      {
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady",
+        "position_x": 4621.938386814063,
+        "position_y": 459.6994059171875
+      },
+      {
+        "kind": "Action",
+        "package": "controlGripper",
+        "name": "openGripper",
+        "position_x": 4900.5442705000005,
+        "position_y": 466.7349080304688
+      },
+      {
+        "kind": "Condition",
+        "package": "gripperOpen",
+        "name": "Condition gripperOpen",
+        "position_x": 5179.150154185938,
+        "position_y": 466.73490803046866
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "moveArmUp",
+        "position_x": 5467.60574083047,
+        "position_y": 466.7349080304688
+      },
+      {
+        "kind": "Action",
+        "package": "idle",
+        "name": "Action idle",
+        "position_x": 5105.25541521797,
+        "position_y": 286.8556437867186
+      }
+    ],
+    "params": []
+  }
+]
