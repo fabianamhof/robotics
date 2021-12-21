@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from inspect import GEN_RUNNING
+#from inspect import GEN_RUNNING
 import rospy
-from geometry_msgs.msg import Point
+from geometry_msgs.msg import Point, Vector3
 from rospy.rostime import get_time
 from std_msgs.msg import Int8
 from std_msgs.msg import Bool
@@ -115,6 +115,10 @@ def cubePos_callback(data):
     global cube_pos
     cube_pos = data
 
+def cubeOri_callback(data):
+    global cube_ori
+    cube_ori = data
+
 
 def listener():
 
@@ -126,6 +130,7 @@ def listener():
     rospy.init_node('rbt_node', anonymous=True)
     r = rospy.Rate(10)
     rospy.Subscriber("cube_pos", Point, cubePos_callback)
+    rospy.Subscriber("cube_ori", Vector3, cubePos_callback)
     rospy.Subscriber("robot_state", Int8, robotState_callback)
     rospy.Subscriber("gripper_state", Int8, gripperState_callback)
     
