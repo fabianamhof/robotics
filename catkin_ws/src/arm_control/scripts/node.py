@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #from inspect import GEN_RUNNING
 import rospy
+import numpy as np
 from geometry_msgs.msg import Point, Vector3
 from rospy.rostime import get_time
 from std_msgs.msg import Int8
 from std_msgs.msg import Bool
 
+table_center = Point(x=1.125, y=0.125, z=0.925)
 pubTargetPos = rospy.Publisher('target_pos', Point, queue_size=1000)
 pubGripperPos = rospy.Publisher('gripper_pos', Bool, queue_size=1000)
 step = 100
@@ -20,6 +22,27 @@ def printState(position, robot_state):
 
 def calculate_target_pos(cube_pos):
     return Point(cube_pos.x + 0.1, cube_pos.y + 0.1, cube_pos.z)
+
+# returns the cubes speed in rad/s given two points and the time taken in seconds
+# best to only call it when object on table 
+def calculate_rotation_speed(start_pos, end_pos, time_taken):
+    start = np.array([start_pos.x,start_pos.y])
+    center = np.array([table_center.x,table_center.y])
+    end = np.array([end_pos.x,end_pos.y])
+
+    center_start = start - center
+    center_end = end - center
+
+    cosine_angle = np.dot(center_start, center_end) / (np.linalg.norm(center_start) * np.linalg.norm(center_end))
+    angle = np.arccos(cosine_angle)
+
+    return (angle/time_taken)
+
+# predicts orientation of cube at a time in the future
+def predict_rotation(cube_ori, rot_speed, expected_time):
+
+    return None
+
 
 def close_gripper():
     gripperWaitingTime = get_time()
