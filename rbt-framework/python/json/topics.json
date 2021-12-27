@@ -5,6 +5,11 @@
     "init": "geometry_msgs.msg.Point(10.0,10.0,10.0)"
   },
   {
+    "name": "cube_ori",
+    "type": "geometry_msgs.msg.Vector3",
+    "init": "geometry_msgs.msg.Vector3(10.0,10.0,10.0)"
+  },
+  {
     "name": "robot_state",
     "type": "std_msgs.msg.Int8",
     "init": "std_msgs.msg.Int8(1)"

@@ -1,7 +1,28 @@
+import time
+
 import py_trees
 import action
-
+import numpy as np
 from geometry_msgs.msg import Point
+from geometry_msgs.msg import Vector3
+
+basicPosition = Point(0.4, 0, 0.4)
+basicOrienation = Vector3(0, np.pi / 2, np.pi)
+placingPosition = Point(0.1, 0.2, 0.6)
+placingOrientation = Vector3(0, np.pi / 2, np.pi)
+
+#offset = 0, range = 90, returns angles between 315 and 45 degrees
+def normalizeAngle(offset, range, angle):
+    new_angle = ((angle - (offset-range/2))%range) + (offset-range/2)
+    return new_angle
+
+def normalizeAngles(angles):
+    print("Normalizing " +  str(angles))
+    x = normalizeAngle(basicOrienation.x, np.pi/2, angles.x)
+    y = normalizeAngle(basicOrienation.y, np.pi/2, angles.y)
+    z = normalizeAngle(basicOrienation.z, np.pi/2, angles.z)
+    print("...to " +  str(Vector3(x,y,z)))
+    return Vector3(x,y,z)
 
 
 class Action(action.Action):
@@ -52,8 +73,10 @@ class Action(action.Action):
         self.logger.debug("  %s [Foo::setup()]" % self.name)
         self.blackboard = py_trees.blackboard.Client(name="calcPos")
         self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.WRITE)
+        self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.READ)
+        self.blackboard.register_key(key="targetOri", access=py_trees.common.Access.WRITE)
         self.blackboard.register_key(key="cube_pos", access=py_trees.common.Access.READ)
-
+        self.blackboard.register_key(key="cube_ori", access=py_trees.common.Access.READ)
 
     def initialise(self):
         """
@@ -67,6 +90,50 @@ class Action(action.Action):
         """
         self.logger.debug("  %s [Foo::initialise()]" % self.name)
 
+    def calcTargetPosition(self):
+        measurement_time = 0.1
+        p1 = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
+        time.sleep(measurement_time)
+        p2 = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
+
+        distance = np.linalg.norm(p2-p1)
+        cube_velocity = distance/measurement_time
+
+        arm_velocity = 0.1
+        arm_position = np.array([self.blackboard.targetPosition.x, self.blackboard.targetPosition.y, self.blackboard.targetPosition.z])
+        distance_to_cube = np.linalg.norm(arm_position - p2)
+        travel_time = distance_to_cube/arm_velocity
+
+        offset = cube_velocity*travel_time
+
+        print("Offset: " + str(offset))
+
+        new_position = Point(self.blackboard.cube_pos.x, self.blackboard.cube_pos.y + offset, self.blackboard.cube_pos.z)
+        new_orientation = normalizeAngles(Vector3(self.blackboard.cube_ori.x, self.blackboard.cube_ori.y, self.blackboard.cube_ori.z))
+        return new_position, new_orientation
+
+    def calcIntermediatePosition(self):
+        measurement_time = 0.1
+        p1 = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
+        time.sleep(measurement_time)
+        p2 = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
+
+        distance = np.linalg.norm(p2-p1)
+        cube_velocity = distance/measurement_time
+
+        arm_velocity = 0.1
+        arm_position = np.array([self.blackboard.targetPosition.x, self.blackboard.targetPosition.y, self.blackboard.targetPosition.z])
+        distance_to_cube = np.linalg.norm(arm_position - p2)
+        travel_time = distance_to_cube/arm_velocity
+
+        offset = cube_velocity*travel_time
+
+        new_position = Point(self.blackboard.cube_pos.x + 0.1, self.blackboard.cube_pos.y + offset, self.blackboard.cube_pos.z)
+        new_orientation = normalizeAngles(Vector3(self.blackboard.cube_ori.x, self.blackboard.cube_ori.y, self.blackboard.cube_ori.z))
+        return new_position, new_orientation
+
+
+
     def update(self):
         """
         When is this called?
@@ -78,19 +145,25 @@ class Action(action.Action):
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
         if self.name == "calcTargetPos":
-            self.blackboard.targetPosition = Point(self.blackboard.cube_pos.x , self.blackboard.cube_pos.y, self.blackboard.cube_pos.z)
+            new_position, new_orientation = self.calcTargetPosition()
+            self.blackboard.targetPosition = new_position
+            self.blackboard.targetOri = new_orientation
         elif self.name == "calcIntermediatePos":
-            self.blackboard.targetPosition = Point(self.blackboard.cube_pos.x + 0.1, self.blackboard.cube_pos.y + 0.1, self.blackboard.cube_pos.z)
+            new_position, new_orientation = self.calcIntermediatePosition()
+            self.blackboard.targetPosition = new_position
+            self.blackboard.targetOri = new_orientation
         elif self.name == "calcNeutralPos":
-            self.blackboard.targetPosition = Point(0.4, 0.0, 0.4)
+            self.blackboard.targetPosition = basicPosition
+            self.blackboard.targetOri = basicOrienation
         elif self.name == "calcPlacingPos":
-            self.blackboard.targetPosition = Point(0.1, 0.2, 0.6)
+            self.blackboard.targetPosition = placingPosition
+            self.blackboard.targetOri = placingOrientation
         else:
-            self.blackboard.targetPosition = Point(0.4, 0.0, 0.4)
+            self.blackboard.targetPosition = basicPosition
+            self.blackboard.targetOri = basicOrienation
 
         print(self.name)
         return py_trees.common.Status.SUCCESS
-
 
     def terminate(self, new_status):
         """
