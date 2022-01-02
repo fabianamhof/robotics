@@ -90,25 +90,41 @@ class Action(action.Action):
         """
         self.logger.debug("  %s [Foo::initialise()]" % self.name)
 
+    # calculate cube rotation speed in rad/s
     def calcTargetPosition(self):
         measurement_time = 0.1
-        p1 = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
+        start = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y])
+        # table position relative to robot hardcoded
+        center = np.array([0.054997384548187, -0.11587217450142])
         time.sleep(measurement_time)
-        p2 = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
+        end = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y])
 
-        distance = np.linalg.norm(p2-p1)
-        cube_velocity = distance/measurement_time
+        center_start = np.linalg.norm(start - center)
+        center_end = np.linalg.norm(end - center)
+
+        cosine_angle = np.dot(center_start, center_end) / (np.linalg.norm(center_start) * np.linalg.norm(center_end))
+        angle = np.arccos(cosine_angle)
+
+        rads = angle/measurement_time
 
         arm_velocity = 0.1
         arm_position = np.array([self.blackboard.targetPosition.x, self.blackboard.targetPosition.y, self.blackboard.targetPosition.z])
-        distance_to_cube = np.linalg.norm(arm_position - p2)
+        end3D = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.y])
+        distance_to_cube = np.linalg.norm(arm_position - end3D)
         travel_time = distance_to_cube/arm_velocity
 
-        offset = cube_velocity*travel_time
+        
+        #offset = cube_velocity*travel_time
+        #print("Offset: " + str(offset))
+        
+        predicted_angle = rads * travel_time
+        rot_matrix = np.array([[np.cos(predicted_angle), -np.sin(predicted_angle)], [np.sin(predicted_angle), np.cos(predicted_angle)]])
+        
+        new_vect = np.dot(rot_matrix, center_end)
+        predicted_point = new_vect + center
 
-        print("Offset: " + str(offset))
-
-        new_position = Point(self.blackboard.cube_pos.x, self.blackboard.cube_pos.y + offset, self.blackboard.cube_pos.z)
+        new_position = Point(predicted_point[0], predicted_point[1], self.blackboard.cube_pos.z)
+        #new_position = Point(self.blackboard.cube_pos.x, self.blackboard.cube_pos.y + offset, self.blackboard.cube_pos.z)
         new_orientation = normalizeAngles(Vector3(self.blackboard.cube_ori.x, self.blackboard.cube_ori.y, self.blackboard.cube_ori.z))
         return new_position, new_orientation
 
