@@ -93,14 +93,14 @@ class Action(action.Action):
     # calculate cube rotation speed in rad/s
     def calcTargetPosition(self):
         measurement_time = 0.1
-        start = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y])
+        start = np.array([self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
         # table position relative to robot hardcoded
-        center = np.array([0.054997384548187, -0.11587217450142])
+        center = np.array([-0.11587262153625, 0.89285403490067])
         time.sleep(measurement_time)
-        end = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y])
+        end = np.array([self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
 
-        center_start = np.linalg.norm(start - center)
-        center_end = np.linalg.norm(end - center)
+        center_start = (start - center)
+        center_end = (end - center)
 
         cosine_angle = np.dot(center_start, center_end) / (np.linalg.norm(center_start) * np.linalg.norm(center_end))
         angle = np.arccos(cosine_angle)
@@ -109,7 +109,7 @@ class Action(action.Action):
 
         arm_velocity = 0.1
         arm_position = np.array([self.blackboard.targetPosition.x, self.blackboard.targetPosition.y, self.blackboard.targetPosition.z])
-        end3D = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.y])
+        end3D = np.array([self.blackboard.cube_pos.x, self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
         distance_to_cube = np.linalg.norm(arm_position - end3D)
         travel_time = distance_to_cube/arm_velocity
 
@@ -123,7 +123,7 @@ class Action(action.Action):
         new_vect = np.dot(rot_matrix, center_end)
         predicted_point = new_vect + center
 
-        new_position = Point(predicted_point[0], predicted_point[1], self.blackboard.cube_pos.z)
+        new_position = Point(self.blackboard.cube_pos.x, predicted_point[0], predicted_point[1])
         #new_position = Point(self.blackboard.cube_pos.x, self.blackboard.cube_pos.y + offset, self.blackboard.cube_pos.z)
         new_orientation = normalizeAngles(Vector3(self.blackboard.cube_ori.x, self.blackboard.cube_ori.y, self.blackboard.cube_ori.z))
         return new_position, new_orientation
@@ -144,7 +144,7 @@ class Action(action.Action):
 
         offset = cube_velocity*travel_time
 
-        new_position = Point(self.blackboard.cube_pos.x + 0.1, self.blackboard.cube_pos.y + offset, self.blackboard.cube_pos.z)
+        new_position = basicPosition
         new_orientation = normalizeAngles(Vector3(self.blackboard.cube_ori.x, self.blackboard.cube_ori.y, self.blackboard.cube_ori.z))
         return new_position, new_orientation
 
