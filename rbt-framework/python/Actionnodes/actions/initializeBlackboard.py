@@ -20,6 +20,8 @@ class Action(action.Action):
         self.blackboard = py_trees.blackboard.Client(name="blackboardInitializer")
         self.blackboard.register_key(key="priorityChanged", access=py_trees.common.Access.WRITE)
         self.blackboard.register_key(key="blackboardInitialized", access=py_trees.common.Access.WRITE)
+        self.blackboard.register_key(key="initDone", access=py_trees.common.Access.WRITE)
+        self.blackboard.register_key(key="armVelocity", access=py_trees.common.Access.WRITE)
         return
 
     def initialise(self):
@@ -31,6 +33,8 @@ class Action(action.Action):
         self.topicsReader = RTReader(self.topiclist)
         self.blackboard.set("priorityChanged", False)
         self.blackboard.set("blackboardInitialized", True)
+        self.blackboard.set("initDone", False)
+        self.blackboard.set("armVelocity", 100.0)
         return py_trees.common.Status.SUCCESS
 
 

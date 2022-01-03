@@ -76,12 +76,10 @@ class Condition(condition.Condition):
           - Set a feedback message
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
-        print(self.name)
         if self.blackboard.robot_state == Int8(1):
-            print("armReady; ready")
             return py_trees.common.Status.SUCCESS
         else:
-            print("armReady; notReady")
+            print("arm notReady")
             return py_trees.common.Status.FAILURE
 
 

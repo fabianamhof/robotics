@@ -12,7 +12,7 @@
   {
     "name": "robot_state",
     "type": "std_msgs.msg.Int8",
-    "init": "std_msgs.msg.Int8(1)"
+    "init": "std_msgs.msg.Int8(0)"
   },
   {
     "name": "gripper_state",

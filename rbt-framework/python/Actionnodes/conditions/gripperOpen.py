@@ -77,10 +77,8 @@ setU
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
         if self.blackboard.gripper_state == Int8(0):
-            print("gripperOpen; Open")
             return py_trees.common.Status.SUCCESS
         else:
-            print("gripperOpen; not Open")
             return py_trees.common.Status.FAILURE
 
 

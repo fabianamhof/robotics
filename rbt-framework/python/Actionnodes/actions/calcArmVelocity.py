@@ -1,11 +1,33 @@
 import py_trees
 import rospy
-from rospy.rostime import get_time
 import action
+import numpy as np
+from rospy.rostime import get_time
 
-
-from std_msgs.msg import Bool
+from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Quaternion
+from geometry_msgs.msg import Point
 from std_msgs.msg import Int8
+
+
+def get_quaternion_from_euler(euler):
+    """
+    Convert an Euler angle to a quaternion.
+
+    Input
+      :param euler.x: The euler.x (rotation around x-axis) angle in radians.
+      :param euler.y: The euler.y (rotation around y-axis) angle in radians.
+      :param euler.z: The euler.z (rotation around z-axis) angle in radians.
+
+    Output
+      :return qx, qy, qz, qw: The orientation in quaternion [x,y,z,w] format
+    """
+    qx = np.sin(euler.x / 2) * np.cos(euler.y / 2) * np.cos(euler.z / 2) - np.cos(euler.x / 2) * np.sin(euler.y / 2) * np.sin(euler.z / 2)
+    qy = np.cos(euler.x / 2) * np.sin(euler.y / 2) * np.cos(euler.z / 2) + np.sin(euler.x / 2) * np.cos(euler.y / 2) * np.sin(euler.z / 2)
+    qz = np.cos(euler.x / 2) * np.cos(euler.y / 2) * np.sin(euler.z / 2) - np.sin(euler.x / 2) * np.sin(euler.y / 2) * np.cos(euler.z / 2)
+    qw = np.cos(euler.x / 2) * np.cos(euler.y / 2) * np.cos(euler.z / 2) + np.sin(euler.x / 2) * np.sin(euler.y / 2) * np.sin(euler.z / 2)
+
+    return Quaternion(qx, qy, qz, qw)
 
 
 class Action(action.Action):
@@ -26,7 +48,7 @@ class Action(action.Action):
         self.executed = False
         self.published = False
         self.publishedTime = get_time()
-        self.publishedCommand = None
+        self.offset = 0.2
 
     def setup(self):
         """
@@ -56,11 +78,13 @@ class Action(action.Action):
           - A parallel checking for a valid policy configuration after
             children have been added or removed
         """
-        self.blackboard = py_trees.blackboard.Client(name="controlGripper")
-        self.blackboard.register_key(key="gripperPosition", access=py_trees.common.Access.READ)
-        self.blackboard.register_key(key="gripperPosition", access=py_trees.common.Access.WRITE)
-        self.blackboard.register_key(key="gripper_state", access=py_trees.common.Access.WRITE)
-        self.pub = rospy.Publisher('gripper_pos', Bool, queue_size=1000)
+        self.blackboard = py_trees.blackboard.Client(name="moveArm")
+        self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.WRITE)
+        self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.READ)
+        self.blackboard.register_key(key="targetOri", access=py_trees.common.Access.READ)
+        self.blackboard.register_key(key="robot_state", access=py_trees.common.Access.WRITE)
+        self.blackboard.register_key(key="armVelocity", access=py_trees.common.Access.WRITE)
+        self.pub = rospy.Publisher('target_pos', Pose, queue_size=1000)
 
         return
 
@@ -86,31 +110,29 @@ class Action(action.Action):
           - Set a feedback message
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
-        if self.published:
-            if (self.blackboard.gripper_state == Int8(1)) == (self.publishedCommand == Bool(True)):
-                self.published = False
-                return py_trees.common.Status.SUCCESS
-            else:
-                if self.publishedTime + 2 < get_time():
-                    self.published = False
-                    return py_trees.common.Status.FAILURE
-                else:
-                    return py_trees.common.Status.RUNNING
+        if self.published and self.publishedTime + 5 < get_time():
+            self.published = False
+            return py_trees.common.Status.FAILURE
+
+        if self.blackboard.robot_state == Int8(1) and self.published:
+            #self.blackboard.armVelocity = (get_time() - self.publishedTime)-0.5/np.sqrt(3*(self.offset**2))
+            self.blackboard.armVelocity = 0.1
+            print(f"Arm Velocity = {self.blackboard.armVelocity}")
+            self.published = False
+            return py_trees.common.Status.SUCCESS
         if not self.published:
-            if self.name == "openGripper":
-                self.blackboard.set("gripperPosition", Bool(False))
-            elif self.name == "closeGripper":
-                self.blackboard.set("gripperPosition", Bool(True))
-            p = self.blackboard.gripperPosition
-            self.pub.publish(p)
+            print("calc Arm Velocity")
+            self.blackboard.set("robot_state", Int8(0))
+            target_pos = Pose()
+            target_pos.position = self.blackboard.targetPosition
+            target_pos.position = Point(target_pos.position.x - self.offset, target_pos.position.y + self.offset, target_pos.position.z + self.offset)
+            target_pos.orientation = get_quaternion_from_euler(self.blackboard.targetOri)
+            self.pub.publish(target_pos)
             self.published = True
             self.publishedTime = get_time()
-            self.publishedCommand = p
-            print("Published Gripper position")
+            print("Published Arm position")
 
         return py_trees.common.Status.RUNNING
-
-
 
     def terminate(self, new_status):
         """

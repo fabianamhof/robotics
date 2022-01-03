@@ -2,6 +2,7 @@ import py_trees
 import rospy
 import action
 import numpy as np
+from rospy.rostime import get_time
 
 from geometry_msgs.msg import Pose
 from geometry_msgs.msg import Quaternion
@@ -46,6 +47,7 @@ class Action(action.Action):
         self.name = name
         self.executed = False
         self.published = False
+        self.publishedTime = get_time()
 
     def setup(self):
         """
@@ -82,7 +84,6 @@ class Action(action.Action):
         self.blackboard.register_key(key="robot_state", access=py_trees.common.Access.WRITE)
         self.pub = rospy.Publisher('target_pos', Pose, queue_size=1000)
 
-        print("moveArm, Setup")
         return
 
     def initialise(self):
@@ -107,6 +108,10 @@ class Action(action.Action):
           - Set a feedback message
           - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
         """
+        if self.published and self.publishedTime + 5 < get_time():
+            self.published = False
+            return py_trees.common.Status.FAILURE
+
         if self.blackboard.robot_state == Int8(1) and self.published:
             self.published = False
             return py_trees.common.Status.SUCCESS
@@ -120,6 +125,7 @@ class Action(action.Action):
             target_pos.orientation = get_quaternion_from_euler(self.blackboard.targetOri)
             self.pub.publish(target_pos)
             self.published = True
+            self.publishedTime = get_time()
             print("Published Arm position")
 
         return py_trees.common.Status.RUNNING

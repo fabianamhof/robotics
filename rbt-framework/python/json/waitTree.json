@@ -6,6 +6,13 @@
     "position_y": 38.0,
     "children": [
       {
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady",
+        "position_x": 3185.2816691460935,
+        "position_y": 757.3845824179689
+      },
+      {
         "kind": "Action",
         "package": "calcPos",
         "name": "calcNeutralPos",
