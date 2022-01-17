@@ -115,7 +115,9 @@ class Action(action.Action):
             return py_trees.common.Status.FAILURE
 
         if self.blackboard.robot_state == Int8(1) and self.published:
-            self.blackboard.armVelocity = np.sqrt(3*(self.offset**2))/(get_time() - self.publishedTime)
+            # Multiplying arm velocity with 0.7 since tests showed that ca 30% of the measured time are overhead (communication, closing gripper, IK)
+            self.blackboard.armVelocity = 0.7 * np.sqrt(3*(self.offset**2))/(get_time() - self.publishedTime)
+
             #self.blackboard.armVelocity = 0.1
             print(f"Arm Velocity = {self.blackboard.armVelocity}")
             self.published = False

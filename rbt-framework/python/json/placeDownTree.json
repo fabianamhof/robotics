@@ -3,96 +3,63 @@
     "name": "Sequence",
     "type": "Sequence",
     "position_x": 3663.7029989851553,
-    "position_y": 49.84970295859375,
+    "position_y": 51.9286311380051,
     "children": [
+      {
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady",
+        "position_x": 2990.41336560525,
+        "position_y": 693.9583797564728
+      },
       {
         "kind": "Action",
         "package": "calcPos",
         "name": "calcNeutralPos",
-        "position_x": 3415.7029989851553,
-        "position_y": 261.84970295859375
+        "position_x": 3396.992645370452,
+        "position_y": 299.2704101879983
       },
       {
-        "name": "armState",
-        "kind": "Controlflow"
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "Action moveArm",
+        "position_x": 3640.83478901163,
+        "position_y": 291.4282665468212
       },
       {
         "kind": "Action",
         "package": "calcPos",
         "name": "calcPlacingPos",
-        "position_x": 3915.573974640626,
-        "position_y": 261.1065063398438
-      },
-      {
-        "name": "Sequence_0",
-        "kind": "Controlflow"
-      }
-    ],
-    "params": []
-  },
-  {
-    "name": "armState",
-    "type": "Sequence",
-    "position_x": 3667.7029989851553,
-    "position_y": 259.84970295859375,
-    "children": [
-      {
-        "kind": "Condition",
-        "package": "robotReady",
-        "name": "Condition robotReady",
-        "position_x": 3553.7278647499998,
-        "position_y": 464.0710042265626
+        "position_x": 3925.647949590987,
+        "position_y": 297.6650510850551
       },
       {
         "kind": "Action",
         "package": "moveArm",
         "name": "Action moveArm",
-        "position_x": 3799.970438714842,
-        "position_y": 461.25680338125
-      }
-    ],
-    "params": []
-  },
-  {
-    "name": "Sequence_0",
-    "type": "Sequence",
-    "position_x": 4166.037849873438,
-    "position_y": 258.2923054945312,
-    "children": [
-      {
-        "kind": "Condition",
-        "package": "robotReady",
-        "name": "Condition robotReady",
-        "position_x": 4087.240226204688,
-        "position_y": 456.88520507187496
-      },
-      {
-        "kind": "Action",
-        "package": "moveArm",
-        "name": "Action moveArm",
-        "position_x": 4364.439009467968,
-        "position_y": 458.29230549453126
+        "position_x": 4210.461110170347,
+        "position_y": 295.58612290564383
       },
       {
         "kind": "Action",
         "package": "controlGripper",
         "name": "openGripper",
-        "position_x": 4900.5442705000005,
-        "position_y": 466.7349080304688
+        "position_x": 4513.984624364406,
+        "position_y": 301.8229074438779
       },
       {
         "kind": "Action",
         "package": "moveArm",
         "name": "moveArmUp",
-        "position_x": 5467.60574083047,
-        "position_y": 466.7349080304688
+        "position_x": 4811.271354020231,
+        "position_y": 301.82290744387797
       },
       {
         "kind": "Action",
         "package": "idle",
         "name": "Action idle",
-        "position_x": 5105.25541521797,
-        "position_y": 286.8556437867186
+        "position_x": 4339.458593328981,
+        "position_y": 35.38816444219361
       }
     ],
     "params": []
