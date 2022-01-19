@@ -65,7 +65,7 @@ Based on the following parameters we would like to change priority of the differ
         \hline
     \end{tabular}
 \end{center}
-
+\noindent
 Since this is a relatively easy task it would be also easy to represent it with a normal BT. However when we use a RBT the table above would be a way how to deal with priorities. Another way is to just consider the distance of the object in the priority function and use the parameter "object grabbed" as precondition for the task "Place Object on Table".
 Therefore if the object is not in reach the robots executes the "wait" task and when the object is in reach the instanciator first checks if the condition "object grabbed" is set. If it is set, then "Place Object on Table" gets executed, if not then "Grab Object" gets executed.
 
@@ -74,4 +74,57 @@ Therefore if the object is not in reach the robots executes the "wait" task and 
 %Another thing that could be improved is the recognition of the object. At the moment, thanks to the simulation, we know the position of the object and so we dont have to recognize it. In the real world however we need some sensor to determinate the position and orientation of the object that we need to pick up. For this one could use a camera and then, based on the position of the camera and the image check where the object lies on the table. \\
 %We would like to focus on the previous points and add this feature only when we're satisfied with section \ref{separate_node} to \ref{implement_rbt}. 
 
+\chapter{Starting point}
+This report builds on a previous work where a 'Franka Emika Panda Robot' grabs a object from a rotating table and replaces it.
+The previous implementation had inverse kinematics already in place which we decided to keep. Furthermore all the code was done in LUA scripts, directly in CoppeliaSim which had to be moved to a external ROS-node to facilitate the addition of the reconfigurable behaviour tree.
+Many parameters such as the time the arm takes to reach a position and the offset, that is needed to 'catch' the object in time, were hardcoded. This poses a problem when the speed of the rotating table changes and weill be calculated dynamically in our implementation.
+
+\begin{figure}[h]
+    \caption{Franka Robot in CoppeliaSim}
+    \includegraphics[width=\textwidth]{arm_coppeliaSim}
+\end{figure}
+
+\chapter{Implementations}
+Here we document the realisazion of the suggested improvements.
+\section{External ROS-node}
+The first thing that had to be done was to allow the robot to interface with a python program.
+This was important since the code for reconfigurable behaviour trees was implemented in python, so it would be easiest way to control the 
+arm.
+We created a few ROS-topics that would be useful:
+
+\begin{description}
+    \item [cube\_ori] the orientation of the cube in euler coordinates 
+    \item [cube\_pos] the position of the cube in relation to the robot arm
+    \item [gripper\_pos] the position of the gripper which will grab the cube
+    \item [gripper\_state] controls the actuation of the gripper
+    \item [robot\_state] integer which determines the state in which the robot is 
+    \item [target\_pos] the position to which the gripper will move
+\end{description}
+\noindent
+Firstly we moved the whole control of the arm from the LUA-script to a external python program, keeping only the inverse kinematics.
+After this we could start to work on our suggested improvements. 
+
+\section{Reconfigurable Behavior Trees}
+Next the RBT \cite{DBLP:journals/corr/abs-2007-10663}, which was written in python was added. \\
+This allowes to create trees in .json, which control the the arm, instead of using the automata-like system
+from before.
+Building on the code given to us we can program the necessary steps which will then bes used by the tree when controlling the arm, e.g. prediction of
+the future position of the cube and its orientation.
+
+\section{Determine table velocity and predicted position}
+By measuring the position two times with a delay inbetween, we can calculate the rotational speed of the object and predict its position after a given peiod.
+In order for the predicted position to be accurate the arms movement velocity and its distance from the cube has to be estimated aswell.
+The last point is quite problematic, since 
+
+\chapter{Reusability and Applicability}
+The implementation we provide can be reused and repurposed easily since it is based on reconfigurable behaviour trees. The reconfigurable behaviour trees allow to alter the arms functionality
+by adding actionnodes or altering them. This makes it more customizable than the version which was given to us. \\
+If the project was to be ported to a physical version some adjustments have to be made:
+\begin{description}
+    \item[Object position] The arm gets its target position from the RBT via ROS-topics, it is calculated with the cube position, which in turn is also a ROS-topic. In order for a physical arm to know where to move, a sensor or camera needs to be put in place instead. 
+    \item[] 
+\end{description} 
+
+
+\bibliography{refs}
 \end{document}
