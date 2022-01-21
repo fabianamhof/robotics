@@ -6,7 +6,7 @@ import std_msgs.msg
 class RTReader:
     def __init__(self, topic_list):
         rospy.init_node("rbtTopicsReader", anonymous=True, disable_signals=True)
-        print("Rospy init node");
+        print("Rospy init node")
         self.blackboard = py_trees.blackboard.Client(name="rTR")
         self.topicList = topic_list
         self.SubList = []

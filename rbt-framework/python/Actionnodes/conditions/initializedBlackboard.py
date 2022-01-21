@@ -6,6 +6,7 @@ import condition
 class Condition(condition.Condition):
     def __init__(self, name):
         super(Condition, self).__init__(name)
+        self.blackboard = None
         self.name = name
         self.executed = False
 

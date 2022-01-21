@@ -17,8 +17,6 @@ class Condition(condition.Condition):
         self.blackboard.register_key(key="priorityChanged", access=py_trees.common.Access.READ)
         self.blackboard.register_key(key="priorityChanged", access=py_trees.common.Access.WRITE)
         self.previous = None
-        print("priorityChanged; Setup");
-
 
     def initialise(self):
         return

@@ -2,12 +2,12 @@ import time
 import action
 import py_trees
 
+
 class Action(action.Action):
     def __init__(self, name):
         super(Action, self).__init__(name)
         self.name = name
         self.executed = False
-
 
     def setup(self):
         return
@@ -20,8 +20,6 @@ class Action(action.Action):
     def update(self):
         self.blackboard.initDone = True
         return py_trees.common.Status.RUNNING
-
-
 
     def terminate(self, new_status):
         return

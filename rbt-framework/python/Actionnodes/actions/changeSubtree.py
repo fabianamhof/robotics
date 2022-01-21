@@ -36,7 +36,7 @@ class Action(action.Action):
                 changingNode.add_child(tree)
             self.prev_subtree = changingNode.children[1].id
 
-            return py_trees.common.Status.FAILURE  # needs to be reevaluted alle the time
+            return py_trees.common.Status.FAILURE  # needs to be reevaluted all the time
         except Exception as e:
             traceback.print_exception(Exception, e, e.__traceback__)
             return py_trees.common.Status.SUCCESS

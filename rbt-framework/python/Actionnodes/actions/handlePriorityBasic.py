@@ -23,7 +23,6 @@ class Action(action.Action):
         self.blackboard.register_key(key="subtree", access=py_trees.common.Access.WRITE)
         self.blackboard.register_key(key="priorityChanged", access=py_trees.common.Access.WRITE)
         self.previous = None
-        print("handlePriority; Setup");
 
     def initialise(self):
         return
@@ -38,6 +37,7 @@ class Action(action.Action):
         if not self.blackboard.initDone:
             newTree = "initTree"
 
+        # We have defined -0.5 < cube_pos.y < 0.5 and 0.6 > cube_pos.z > 0.1 as "cube in range"
         if self.blackboard.initDone:
             if -0.5 < cube_pos.y < 0.5 and 0.6 > cube_pos.z > 0.1 and self.reset and gripper_state == Int8(0):
                 newTree = "pickUpTree"

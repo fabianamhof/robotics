@@ -17,7 +17,6 @@ def normalizeAngle(offset, range, angle):
     new_angle = ((angle - (offset - range / 2)) % range) + (offset - range / 2)
     return new_angle
 
-
 def normalizeAngles(angles):
     #print("Normalizing " + str(angles))
     x = normalizeAngle(basicOrienation.x, np.pi / 2, angles.x)
@@ -26,7 +25,6 @@ def normalizeAngles(angles):
     #print("...to " + str(Vector3(x, y, z)))
     return Vector3(x, y, z)
 
-
 def calcTravelTime(arm_position, end_position, arm_velocity):
     distance_to_cube = np.linalg.norm(arm_position - end_position)
     return distance_to_cube / arm_velocity
@@ -34,49 +32,12 @@ def calcTravelTime(arm_position, end_position, arm_velocity):
 
 class Action(action.Action):
     def __init__(self, name):
-        """
-        Minimal one-time initialisation. A good rule of thumb is
-        to only include the initialisation relevant for being able
-        to insert this behaviour in a tree for offline rendering to
-        dot graphs.
-
-        Other one-time initialisation requirements should be met via
-        the setup() method.
-        """
         super(Action, self).__init__(name)
         self.blackboard = None
         self.name = name
         self.executed = False
 
     def setup(self):
-        """
-        When is this called?
-          This function should be either manually called by your program
-          to setup this behaviour alone, or more commonly, via
-          :meth:`~py_trees.behaviour.Behaviour.setup_with_descendants`
-          or :meth:`~py_trees.trees.BehaviourTree.setup`, both of which
-          will iterate over this behaviour, it's children (it's children's
-          children ...) calling :meth:`~py_trees.behaviour.Behaviour.setup`
-          on each in turn.
-
-          If you have vital initialisation necessary to the success
-          execution of your behaviour, put a guard in your
-          :meth:`~py_trees.behaviour.Behaviour.initialise` method
-          to protect against entry without having been setup.
-
-        What to do here?
-          Delayed one-time initialisation that would otherwise interfere
-          with offline rendering of this behaviour in a tree to dot graph
-          or validation of the behaviour's configuration.
-
-          Good examples include:
-
-          - Hardware or driver initialisation
-          - Middleware initialisation (e.g. ROS pubs/subs/services)
-          - A parallel checking for a valid policy configuration after
-            children have been added or removed
-        """
-        self.logger.debug("  %s [Foo::setup()]" % self.name)
         self.blackboard = py_trees.blackboard.Client(name="calcPos")
         self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.WRITE)
         self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.READ)
@@ -86,18 +47,11 @@ class Action(action.Action):
         self.blackboard.register_key(key="cube_ori", access=py_trees.common.Access.READ)
 
     def initialise(self):
-        """
-        When is this called?
-          The first time your behaviour is ticked and anytime the
-          status is not RUNNING thereafter.
+        return
 
-        What to do here?
-          Any initialisation you need before putting your behaviour
-          to work.
-        """
-        self.logger.debug("  %s [Foo::initialise()]" % self.name)
-
-    # calculate cube rotation speed in rad/s
+    '''
+    Calculate cube rotation speed in rad/s and returns the position of the cube based on the travel_time of the gripper
+    '''
     def calcTargetPosition(self, travel_time):
         measurement_time = 0.1
         start = np.array([self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
@@ -114,11 +68,7 @@ class Action(action.Action):
 
         rads = angle / measurement_time
 
-        print("Rads/s = " + str(rads))
-
-        # offset = cube_velocity*travel_time
-        # print("Offset: " + str(offset))
-
+        print("Table velocity Rads/s = " + str(rads))
         predicted_angle = rads * travel_time
         rot_matrix = np.array(
             [[np.cos(predicted_angle), -np.sin(predicted_angle)], [np.sin(predicted_angle), np.cos(predicted_angle)]])
@@ -127,12 +77,14 @@ class Action(action.Action):
         predicted_point = new_vect + center
 
         new_position = Point(self.blackboard.cube_pos.x, predicted_point[0], predicted_point[1])
-        # new_position = Point(self.blackboard.cube_pos.x, self.blackboard.cube_pos.y + offset, self.blackboard.cube_pos.z)
         new_orientation = normalizeAngles(
             Vector3(self.blackboard.cube_ori.x, self.blackboard.cube_ori.y, self.blackboard.cube_ori.z))
         new_orientation.x = new_orientation.x - rads * travel_time
         return new_position, new_orientation
 
+    '''
+    Returns a position that is above the cube to avoid pushing it by positioning the gripper
+    '''
     def calcIntermediatePosition(self):
         x_offset = 0.2
         arm_position = np.array(
@@ -144,15 +96,6 @@ class Action(action.Action):
         return new_intermediate_position, new_orientation
 
     def update(self):
-        """
-        When is this called?
-          Every time your behaviour is ticked.
-
-        What to do here?
-          - Triggering, checking, monitoring. Anything...but do not block!
-          - Set a feedback message
-          - return a py_trees.common.Status.[RUNNING, SUCCESS, FAILURE]
-        """
         if self.name == "calcTargetPos":
             arm_position = np.array(
                 [self.blackboard.targetPosition.x, self.blackboard.targetPosition.y, self.blackboard.targetPosition.z])
@@ -175,14 +118,7 @@ class Action(action.Action):
             self.blackboard.targetPosition = basicPosition
             self.blackboard.targetOri = basicOrienation
 
-        print(self.name)
         return py_trees.common.Status.SUCCESS
 
     def terminate(self, new_status):
-        """
-        When is this called?
-           Whenever your behaviour switches to a non-running state.
-            - SUCCESS || FAILURE : your behaviour's work cycle has finished
-            - INVALID : a higher priority branch has interrupted, or shutting down
-        """
-        self.logger.debug("  %s [Foo::terminate().terminate()][%s->%s]" % (self.name, self.status, new_status))
+        return
