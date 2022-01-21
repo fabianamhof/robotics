@@ -19,7 +19,7 @@ If a failure occurs, or you just want to restart the RBT please close guiMain, t
 Since we are estimating the end-effector velocity by moving it and measuring the time it takes to move it there are some problems.
 1. There are many overheads that can not be considered (communication, inverse kinematics,...). Because of that the calculated arm velocity is not as exact as we wish, it could be that the gripper does not grab the cube exactly in the middle.
 2. Changing the simulation velocity after starting the RBT obviously leads to problems since the calculated arm velocity isn't right anymore.
-
+3. We observed that the velocity of end-effector somehow (and only sometimes) depends on the change of orientation it has to perform, this could lead to additional problems when picking up the cube.
 ### Comments for the RBT framework
 We have changed the RBT framework a little for our needs. Now you can specify the type of the ROS Topic in the topics.json file.
 In order to be able to load our Trees (pickUpTree.json, initTree.json,...) you first have to load the basicTreeProject.json, otherwise the rbt-framework throws an error.
