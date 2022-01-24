@@ -53,7 +53,7 @@ class Action(action.Action):
     Calculate cube rotation speed in rad/s and returns the position of the cube based on the travel_time of the gripper
     '''
     def calcTargetPosition(self, travel_time):
-        measurement_time = 0.1
+        measurement_time = 0.3
         start = np.array([self.blackboard.cube_pos.y, self.blackboard.cube_pos.z])
         # table position relative to robot hardcoded
         center = np.array([-0.11587262153625, 0.89285403490067])
