@@ -95,8 +95,8 @@ We created a few ROS-topics that would be useful:
 \begin{description}
     \item [cube\_ori] the orientation of the cube in euler coordinates 
     \item [cube\_pos] the position of the cube in relation to the robot arm
-    \item [gripper\_pos] the position of the gripper which will grab the cube
-    \item [gripper\_state] controls the actuation of the gripper
+    \item [gripper\_pos] controls (open, close) of the gripper
+    \item [gripper\_state] returns if the gripper has grabbed a object or not
     \item [robot\_state] integer which determines the state in which the robot is 
     \item [target\_pos] the position to which the gripper will move
 \end{description}
@@ -108,13 +108,40 @@ After this we could start to work on our suggested improvements.
 Next the RBT \cite{DBLP:journals/corr/abs-2007-10663}, which was written in python was added. \\
 This allowes to create trees in .json, which control the the arm, instead of using the automata-like system
 from before.
-Building on the code given to us we can program the necessary steps which will then bes used by the tree when controlling the arm, e.g. prediction of
-the future position of the cube and its orientation.
+Building on the code given to us we can program the necessary steps which will then be used by the tree when controlling the arm, e.g. prediction of
+the future position of the cube and its orientation. \\
+The advantage of behaviour trees is the reusability of code the main drawback here is the problmatic integration of control features. \cite{DBLP:journals/corr/abs-2007-10663}
+This is because control features cannot be readonstantly.
+RBT address this issue by implementing parallel nodes witch allow for consistent calls on the our features. \\
+In the following subsections each tree used by the robot will be briefly described:
+
+\subsection{Basic tree}
+\begin{figure}[h]
+    \caption{Basic Tree}
+    \includegraphics[scale=0.2]{basicTree.png}
+\end{figure}
+This tree is the one used to to call the remaining individual trees to perform the grabbing task. Firstly it inizializes the blackboard, which in the RBT framework we were provided
+is a container for variables which can be used by multiple nodes to exchange data. The blackboard is also useful when working with ROS-topics, allowing to just put them in a .json file and subscribing them automatically with a python programm.
+Lastly the priorities are handled with the accordongly named node and a tree for each situation is chosen and switched to.
+The handle Pryority action determines which tree should be executed at any time. That specific subtree is then called each time a change in priority was detected. 
+
+\subsection{Init tree}
+The init tree is called only once and is used to firstly move the arm into a standard position and than perform a calibration movement, in order to get a approximate movement speed. 
+
+\subsection{Wait tree}
+The wait tree is self explainatory, it waits until the object on the table is in reach of the arm.
+Specifically it opens the gripper and moves to a neutral position.
+
+\subsection{Pickup tree}
+
+\subsection{Placedown tree}
 
 \section{Determine table velocity and predicted position}
 By measuring the position two times with a delay inbetween, we can calculate the rotational speed of the object and predict its position after a given peiod.
 In order for the predicted position to be accurate the arms movement velocity and its distance from the cube has to be estimated aswell.
 The last point is quite problematic, since 
+
+\section{Improved Grabbing Capability}
 
 \chapter{Reusability and Applicability}
 The implementation we provide can be reused and repurposed easily since it is based on reconfigurable behaviour trees. The reconfigurable behaviour trees allow to alter the arms functionality
