@@ -77,15 +77,20 @@ Therefore if the object is not in reach the robots executes the "wait" task and 
 \chapter{Starting point}
 This report builds on a previous work where a 'Franka Emika Panda Robot' grabs a object from a rotating table and replaces it.
 The previous implementation had inverse kinematics already in place which we decided to keep. Furthermore all the code was done in LUA scripts, directly in CoppeliaSim which had to be moved to a external ROS-node to facilitate the addition of the reconfigurable behaviour tree.
-Many parameters such as the time the arm takes to reach a position and the offset, that is needed to 'catch' the object in time, were hardcoded. This poses a problem when the speed of the rotating table changes and weill be calculated dynamically in our implementation.
+Many parameters such as the time the arm takes to reach a position and the offset, that is needed to 'catch' the object in time, were hardcoded. This poses a problem when the speed of the rotating table changes and will be calculated dynamically in our implementation.\\
+We were provided with the framework for the 
 
 \begin{figure}[h]
     \caption{Franka Robot in CoppeliaSim}
     \includegraphics[width=\textwidth]{arm_coppeliaSim}
 \end{figure}
+\noindent
+The RBT framework provided to us requires Python 3.8 and the programm could misbehave if not run correctly.
+A guide on how to execute the code of this project can be found in the readme of the github repository. 
 
 \chapter{Implementations}
 Here we document the realisazion of the suggested improvements.
+
 \section{External ROS-node}
 The first thing that had to be done was to allow the robot to interface with a python program.
 This was important since the code for reconfigurable behaviour trees was implemented in python, so it would be easiest way to control the 
@@ -111,15 +116,11 @@ from before.
 Building on the code given to us we can program the necessary steps which will then be used by the tree when controlling the arm, e.g. prediction of
 the future position of the cube and its orientation. \\
 The advantage of behaviour trees is the reusability of code the main drawback here is the problmatic integration of control features. \cite{DBLP:journals/corr/abs-2007-10663}
-This is because control features cannot be readonstantly.
+This is because control features cannot be read instantly.
 RBT address this issue by implementing parallel nodes witch allow for consistent calls on the our features. \\
 In the following subsections each tree used by the robot will be briefly described:
 
 \subsection{Basic tree}
-\begin{figure}[h]
-    \caption{Basic Tree}
-    \includegraphics[scale=0.2]{basicTree.png}
-\end{figure}
 This tree is the one used to to call the remaining individual trees to perform the grabbing task. Firstly it inizializes the blackboard, which in the RBT framework we were provided
 is a container for variables which can be used by multiple nodes to exchange data. The blackboard is also useful when working with ROS-topics, allowing to just put them in a .json file and subscribing them automatically with a python programm.
 Lastly the priorities are handled with the accordongly named node and a tree for each situation is chosen and switched to.
@@ -133,8 +134,19 @@ The wait tree is self explainatory, it waits until the object on the table is in
 Specifically it opens the gripper and moves to a neutral position.
 
 \subsection{Pickup tree}
+The pickup tree manages the grabbing of the cube and is called when the object on the table is in reach of the arm. \\
+The first thing it does is check if the arm is ready and opens the gripper. Then a intermediate position is calculated using the tables rotational speed, this means that the arm will move to a predicted point above the cube and is done
+so that the arm will move in on the cube from above, avoiding pushing it around or even knocking it off the table. Then again using the rotational speed of the table and the estimated travel time of the arm, a new point is calculated.
+This time the gripper will move directly onto the cubes predicted position, once reached it closes the gripper and lifts the cube off the table.
 
 \subsection{Placedown tree}
+Lastly the placedown tree moves the gripper, holding the cube, back into its neutral position. Once reached the point at whitch the object should be placed is calculated and the arm moves to it.
+The cube is released, and the gripper moves up before returning to the neutral position avoiding misplacement.
+
+\begin{figure}[h]
+    \caption{Basic Tree}
+    \includegraphics[scale=0.2]{basicTree.png}
+\end{figure}
 
 \section{Determine table velocity and predicted position}
 By measuring the position two times with a delay inbetween, we can calculate the rotational speed of the object and predict its position after a given peiod.
