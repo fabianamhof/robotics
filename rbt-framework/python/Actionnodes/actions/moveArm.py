@@ -9,6 +9,8 @@ from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Point
 from std_msgs.msg import Int8
 
+def pos_equals(pos1, pos2, threshold):
+    return abs(pos1.x - pos2.x) < threshold and abs(pos1.y - pos2.y) < threshold and abs(pos1.z - pos2.z) < threshold
 
 def get_quaternion_from_euler(euler):
     """
@@ -46,6 +48,7 @@ class Action(action.Action):
         self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.READ)
         self.blackboard.register_key(key="targetOri", access=py_trees.common.Access.READ)
         self.blackboard.register_key(key="robot_state", access=py_trees.common.Access.WRITE)
+        self.blackboard.register_key(key="endeffector_pos", access=py_trees.common.Access.READ)
         self.pub = rospy.Publisher('target_pos', Pose, queue_size=1000)
         return
 
@@ -57,7 +60,7 @@ class Action(action.Action):
             self.published = False
             return py_trees.common.Status.FAILURE
 
-        if self.blackboard.robot_state == Int8(1) and self.published:
+        if self.published and self.blackboard.robot_state == Int8(1) and pos_equals(self.blackboard.endeffector_pos, self.blackboard.targetPosition, 0.01):
             self.published = False
             return py_trees.common.Status.SUCCESS
         if not self.published:

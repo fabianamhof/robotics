@@ -18,5 +18,10 @@
     "name": "gripper_state",
     "type": "std_msgs.msg.Int8",
     "init": "std_msgs.msg.Int8(0)"
+  },
+  {
+    "name": "endeffector_pos",
+    "type": "geometry_msgs.msg.Point",
+    "init": "geometry_msgs.msg.Point(10.0,10.0,10.0)"
   }
 ]

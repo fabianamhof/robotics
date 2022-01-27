@@ -9,6 +9,8 @@ from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Point
 from std_msgs.msg import Int8
 
+def pos_equals(pos1, pos2, threshold):
+    return abs(pos1.x - pos2.x) < threshold and abs(pos1.y - pos2.y) < threshold and abs(pos1.z - pos2.z) < threshold
 
 def get_quaternion_from_euler(euler):
     """
@@ -40,12 +42,14 @@ class Action(action.Action):
         self.published = False
         self.publishedTime = get_time()
         self.offset = 0.2
+        self.target_point = None
 
     def setup(self):
         self.blackboard = py_trees.blackboard.Client(name="moveArm")
         self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.WRITE)
         self.blackboard.register_key(key="targetPosition", access=py_trees.common.Access.READ)
         self.blackboard.register_key(key="targetOri", access=py_trees.common.Access.READ)
+        self.blackboard.register_key(key="endeffector_pos", access=py_trees.common.Access.READ)
         self.blackboard.register_key(key="robot_state", access=py_trees.common.Access.WRITE)
         self.blackboard.register_key(key="armVelocity", access=py_trees.common.Access.WRITE)
         self.pub = rospy.Publisher('target_pos', Pose, queue_size=1000)
@@ -62,9 +66,9 @@ class Action(action.Action):
             self.published = False
             return py_trees.common.Status.FAILURE
 
-        if self.blackboard.robot_state == Int8(1) and self.published:
-            # Multiplying arm velocity with 0.7 since tests showed that ca 30% of the measured time are overhead (communication, closing gripper, IK)
-            self.blackboard.armVelocity = 0.7 * np.sqrt(3*(self.offset**2))/(get_time() - self.publishedTime)
+        if self.published and self.blackboard.robot_state == Int8(1) and pos_equals(self.blackboard.endeffector_pos, self.target_point, 0.01):
+            # Multiplying arm velocity with 0.8 since tests showed that ca 30% of the measured time are overhead (communication, closing gripper, IK)
+            self.blackboard.armVelocity = 0.8 * np.sqrt(3*(self.offset**2))/(get_time() - self.publishedTime)
             print(f"Arm Velocity = {self.blackboard.armVelocity}")
             self.published = False
             return py_trees.common.Status.SUCCESS
@@ -74,6 +78,7 @@ class Action(action.Action):
             target_pos = Pose()
             target_pos.position = self.blackboard.targetPosition
             target_pos.position = Point(target_pos.position.x - self.offset, target_pos.position.y + self.offset, target_pos.position.z + self.offset)
+            self.target_point = target_pos.position
             target_pos.orientation = get_quaternion_from_euler(self.blackboard.targetOri)
             self.pub.publish(target_pos)
             self.published = True
