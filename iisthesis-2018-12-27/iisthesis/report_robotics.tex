@@ -4,6 +4,9 @@
 % These two packages are highly recommended:
 \usepackage[T1]{fontenc} % make non-ASCII characters cut&pastable in PDF
 \usepackage{lmodern}     % easiest way to get outline fonts with T1 encoding
+\usepackage{subcaption}
+\usepackage{amsmath}
+
 
 % \usepackage[ngerman]{babel}     % if the thesis is written in German
 
@@ -12,15 +15,18 @@
 \supervisor{Dr. Matteo Saveriano}
 %\supervisor{Firstname1 Lastname1\\ Firstname2 Lastname2}
 
-
 \begin{document}
 \maketitle
+\pagenumbering{arabic}
+\chapter{Abstract}
+In this project we have a rotating table with an object on it. The task is to grab this object with a "Franka Emika Panda Robot", pick it up, and then place it again on the table. 
+Some work was provided from last years course, where the basic functionality is already implemented. 
+The robot already grabs the object and places it again on the table but in a way that can be improved in many terms.
+This implementation does not estimate the table velocity, a static offset to the objects position was hardcoded. This resulted in the robot pushing the cube off the table in some situations.\\
+We will use a framework for RBTs to implement a customizable implementation of the given project allowing for improved reusability of the code. 
+
 \tableofcontents
 \label{chap:declare}
-
-\chapter{Introduction}
-In this project we have a rotating table with an Object on it. The task is to grab this object with a "Franka Emika Panda Robot", pick it up, and then place it again on the table. It was provided some work from last years course, where the basic functionality is already implemented. So the robot already grabs already the object and places it again on the table but he does it in a way that can be improved in many terms.
-This implementation does not estimate the table velocity, they only have hardcoded some static offset to the objects position. Because of that the robot failed some times when he tried to grab the cube. 
 
 \chapter{Improvements}
 \label{improvements}
@@ -74,8 +80,10 @@ Therefore if the object is not in reach the robots executes the "wait" task and 
 %Another thing that could be improved is the recognition of the object. At the moment, thanks to the simulation, we know the position of the object and so we dont have to recognize it. In the real world however we need some sensor to determinate the position and orientation of the object that we need to pick up. For this one could use a camera and then, based on the position of the camera and the image check where the object lies on the table. \\
 %We would like to focus on the previous points and add this feature only when we're satisfied with section \ref{separate_node} to \ref{implement_rbt}. 
 
+\setcounter{chapter}{1}
+\setcounter{section}{0}
 \chapter{Starting point}
-This report builds on a previous work where a 'Franka Emika Panda Robot' grabs a object from a rotating table and replaces it.
+This report builds on a previous work where a 'Franka Emika Panda Robot' grabs a object from a rotating table and places it again.
 The previous implementation had inverse kinematics already in place which we decided to keep. Furthermore all the code was done in LUA scripts, directly in CoppeliaSim which had to be moved to a external ROS-node to facilitate the addition of the reconfigurable behaviour tree.
 Many parameters such as the time the arm takes to reach a position and the offset, that is needed to 'catch' the object in time, were hardcoded. This poses a problem when the speed of the rotating table changes and will be calculated dynamically in our implementation.\\
 We were provided with the framework for the 
@@ -88,6 +96,8 @@ We were provided with the framework for the
 The RBT framework provided to us requires Python 3.8 and the programm could misbehave if not run correctly.
 A guide on how to execute the code of this project can be found in the readme of the github repository. 
 
+\setcounter{chapter}{2}
+\setcounter{section}{0}
 \chapter{Implementations}
 Here we document the realisazion of the suggested improvements.
 
@@ -144,25 +154,95 @@ Lastly the placedown tree moves the gripper, holding the cube, back into its neu
 The cube is released, and the gripper moves up before returning to the neutral position avoiding misplacement.
 
 \begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{.45\linewidth}
+    \includegraphics[width=\linewidth]{basicTree.png}
     \caption{Basic Tree}
-    \includegraphics[scale=0.2]{basicTree.png}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{waitTree.png}
+        \caption{Wait Tree}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{initTree.png}
+        \caption{Init Tree}
+    \end{subfigure}
+
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{pickupTree.png}
+        \caption{Pickup Tree}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\linewidth}
+        \includegraphics[width=\linewidth]{placedownTree.png}
+        \caption{Placedown Tree}
+    \end{subfigure}
+    \caption{The trees in treeviewer.py}
 \end{figure}
 
 \section{Determine table velocity and predicted position}
 By measuring the position two times with a delay inbetween, we can calculate the rotational speed of the object and predict its position after a given peiod.
+This is done whith linear algebra using a third point, the tables center. The center of the table is hardcoded, to avoid using a additional topic for a value that will not change during the simulation. \\
+The angle is calculated as follows:
+$$
+\theta = \arccos \left ( \frac{\overrightarrow{P_cP_s} \cdot \overrightarrow{P_cP_e}}{\left | \overrightarrow{P_cP_s} \right | * \left | \overrightarrow{P_cP_s} \right |} \right) \\
+$$
+$P_c :=$ Center of table \\
+$P_s :=$ Starting point of measurement \\
+$P_e :=$ Endpoint of measurement \\
+
 In order for the predicted position to be accurate the arms movement velocity and its distance from the cube has to be estimated aswell.
-The last point is quite problematic, since 
+The last point is quite problematic, in order predict the cubes position we need the time that the arm takes to reach that position and not knowing the position means we can't calculate the travel time, 
+essentially we two unknown variables.
+To circumvent this, the travel time to the cubes last known position is used instead, this means that the arm will arive at the predicted point before the cube 
+and therefore the gripper will not move in a perfect vertical motion. In practice this did not impact the action but could cause problems if the shape of the object on the table was different.
+Since the same argument could be brought up for a vertical movement we kept this implementation because it does not affect the cube. \\
+With the angle, the delay between measurements and the arms movementspeed a position can be predicted using a simple rotational matrix:
+$$
+\theta_{pred} = \frac{\theta}{t_m} * t_t
+$$
+$t_m :=$ time between measurments \\
+$t_t :=$ traveltime of arm 
+$$
+P_{pred} =
+\begin{pmatrix}
+    \cos\theta_{pred} & -\sin\theta_{pred} \\
+    \sin\theta_{pred} & \cos\theta_{pred}
+\end{pmatrix}
+\cdot \overrightarrow{P_cP_e}
++ P_c
+$$
+The rotational matrix is only 2D because the calculation was done on a plane to simplify things. The z-value was set to a constant value in order to return to 3D. 
 
 \section{Improved Grabbing Capability}
+When the simulation starts the cube is aligned in a way that allows the arm to grab it correctly. If the object gets pushed or dropped on the table incorectly the grabbing action could run in to problems
+on the next round. To avoid this we added the capability for the gripper to rotate and adjust itself to the cubes orientation.
+The orientational coordinates are defined in euler angles and can be passed via a topic using a 3D-vector.
+Euler angles are a set of 3 angles, which define the pitch roll and yaw of of a object. In this scenario the yaw is most important, since we can use it to rotate the gripper on its vertical axis.
+The main problem when setting the yaw of the gripper to match the one of the cube was that axis of the robot and the ones of the cube do not start facing the same way, even if the shape of the cube allowes 
+to pick it up when it is laying on the 'wrong face' it is easier to normalize its coordinates so the gripper can be controlled the same regardless which direction the cube faces. 
+Should the cube be flipped for whatever reason between turns the gripper will always move in to grab it from above.
+As a side benefit this means that the gripper avoids unnecessary 180° turns.
 
-\chapter{Reusability and Applicability}
+\setcounter{chapter}{3}
+\setcounter{section}{0}
+\chapter{Reusability, Applicability and Possible Problems}
 The implementation we provide can be reused and repurposed easily since it is based on reconfigurable behaviour trees. The reconfigurable behaviour trees allow to alter the arms functionality
-by adding actionnodes or altering them. This makes it more customizable than the version which was given to us. \\
+by adding actionnodes or expand on them. This makes it more customizable than the version which was given to us. \\
 If the project was to be ported to a physical version some adjustments have to be made:
 \begin{description}
     \item[Object position] The arm gets its target position from the RBT via ROS-topics, it is calculated with the cube position, which in turn is also a ROS-topic. In order for a physical arm to know where to move, a sensor or camera needs to be put in place instead. 
-    \item[] 
+    \item[Grabbing different objects] The current implementation is intended for objects that can be picked up from above. In our scenario this works fine, should this implementation be used in the physical world where objects might be too delicate or the shape is impossible
+    to grab from above, the gripper motion has to be reworked, this can be done on top of the existing work.
 \end{description} 
+\noindent
+\section{Basis for future scenarios}
+The current functionallity can repurposed to solve other problems with not much alteration.
+\begin{itemize}
+    \item The arm can handle multiple objects if orientation- and position-topics are added for ROS and the action nodes are modified to check each ones position. 
+    \item If the objects were on a convejor belt calcPos.py can be changed to predict the future position on a linear trajectory instead of a rotational one.
+    \item If only certain kinds of objects should be grabbed a condition can be added in handlyPriority.py. These objects can be moved from one moving table to another or sort them.
+\end{itemize}
 
 
 \bibliography{refs}
