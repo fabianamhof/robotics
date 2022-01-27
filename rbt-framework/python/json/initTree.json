@@ -6,8 +6,32 @@
     "position_y": 38.0,
     "children": [
       {
-        "name": "armReady",
-        "kind": "Controlflow"
+        "kind": "Condition",
+        "package": "robotReady",
+        "name": "Condition robotReady",
+        "position_x": 2990.41336560525,
+        "position_y": 693.9583797564728
+      },
+      {
+        "kind": "Action",
+        "package": "calcPos",
+        "name": "calcNeutralPos",
+        "position_x": 3881.0,
+        "position_y": 268.0
+      },
+      {
+        "kind": "Action",
+        "package": "moveArm",
+        "name": "Action moveArm",
+        "position_x": 4414.0,
+        "position_y": 268.0
+      },
+      {
+        "kind": "Action",
+        "package": "controlGripper",
+        "name": "openGripper",
+        "position_x": 4513.984624364406,
+        "position_y": 301.8229074438779
       },
       {
         "kind": "Action",
@@ -36,57 +60,6 @@
         "name": "Action initDone",
         "position_x": 5105.25541521797,
         "position_y": 286.8556437867186
-      }
-    ],
-    "params": []
-  },
-  {
-    "name": "armReady",
-    "type": "Fallback",
-    "position_x": 3287.2816691460935,
-    "position_y": 548.3845824179689,
-    "children": [
-      {
-        "kind": "Condition",
-        "package": "robotReady",
-        "name": "Condition robotReady",
-        "position_x": 3185.2816691460935,
-        "position_y": 757.3845824179689
-      },
-      {
-        "name": "controlArm",
-        "kind": "Controlflow"
-      }
-    ],
-    "params": []
-  },
-  {
-    "name": "controlArm",
-    "type": "Sequence",
-    "position_x": 3287.2816691460935,
-    "position_y": 548.3845824179689,
-    "children":
-    [
-      {
-        "kind": "Action",
-        "package": "calcPos",
-        "name": "calcNeutralPos",
-        "position_x": 3735.2816691460935,
-        "position_y": 757.3845824179689
-      },
-      {
-        "kind": "Action",
-        "package": "controlGripper",
-        "name": "openGripper",
-        "position_x": 3735.2816691460935,
-        "position_y": 757.3845824179689
-      },
-      {
-        "kind": "Action",
-        "package": "moveArm",
-        "name": "Action moveArm",
-        "position_x": 4135.2816691460935,
-        "position_y": 757.3845824179689
       }
     ],
     "params": []
