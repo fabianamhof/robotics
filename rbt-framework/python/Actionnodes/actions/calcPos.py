@@ -7,6 +7,7 @@ from geometry_msgs.msg import Point
 from geometry_msgs.msg import Vector3
 
 basicPosition = Point(0.4, 0, 0.4)
+#Orientation of the gripper when the simulation is started
 basicOrienation = Vector3(0, np.pi / 2, np.pi)
 placingPosition = Point(0.1, 0.1, 0.5)
 placingOrientation = Vector3(0, np.pi / 2, np.pi)

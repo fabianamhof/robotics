@@ -86,7 +86,6 @@ Therefore if the object is not in reach the robots executes the "wait" task and 
 This report builds on a previous work where a 'Franka Emika Panda Robot' grabs a object from a rotating table and places it again.
 The previous implementation had inverse kinematics already in place which we decided to keep. Furthermore all the code was done in LUA scripts, directly in CoppeliaSim which had to be moved to a external ROS-node to facilitate the addition of the reconfigurable behaviour tree.
 Many parameters such as the time the arm takes to reach a position and the offset, that is needed to 'catch' the object in time, were hardcoded. This poses a problem when the speed of the rotating table changes and will be calculated dynamically in our implementation.\\
-We were provided with the framework for the 
 
 \begin{figure}[h]
     \caption{Franka Robot in CoppeliaSim}
@@ -94,7 +93,8 @@ We were provided with the framework for the
 \end{figure}
 \noindent
 The RBT framework provided to us requires Python 3.8 and the programm could misbehave if not run correctly.
-A guide on how to execute the code of this project can be found in the readme of the github repository. 
+A guide on how to execute the code of this project can be found in the readme of the github repository. \\ 
+\url{https://github.com/fabianamhof/robotics.git}
 
 \setcounter{chapter}{2}
 \setcounter{section}{0}
@@ -223,6 +223,16 @@ The main problem when setting the yaw of the gripper to match the one of the cub
 to pick it up when it is laying on the 'wrong face' it is easier to normalize its coordinates so the gripper can be controlled the same regardless which direction the cube faces. 
 Should the cube be flipped for whatever reason between turns the gripper will always move in to grab it from above.
 As a side benefit this means that the gripper avoids unnecessary 180° turns.
+The orientation is adjusted manipulating the basic position, i.e.g the one the simulation starts in.
+$$
+f(\alpha, \beta, \gamma) = ((\gamma - (\alpha - \frac{\beta}{2})) \mod (\beta + (\alpha - \frac{\beta}{2}))
+$$
+$\alpha :=$ offset \\
+$\beta :=$ range\\
+$\gamma :=$ angle
+
+Maximum allowed rotation is $\alpha \pm \frac{\beta}{2}$. \\
+Basically what is done here is transforming the cubes axis to match the one of the robot, this can then be passed onto the gripper via a ROS-topic directly.
 
 \setcounter{chapter}{3}
 \setcounter{section}{0}
