@@ -6,7 +6,7 @@
 \usepackage{lmodern}     % easiest way to get outline fonts with T1 encoding
 \usepackage{subcaption}
 \usepackage{amsmath}
-
+\let\cleardoublepage\clearpage
 
 % \usepackage[ngerman]{babel}     % if the thesis is written in German
 \title{Rotating Table Task with Reconfigurable Behaviour Trees}
@@ -153,7 +153,7 @@ This time the gripper will move directly onto the cubes predicted position, once
 Lastly the placedown tree moves the gripper, holding the cube, back into its neutral position. Once reached the point at which the object should be placed is calculated and the arm moves to it.
 The cube is released, and the gripper moves up before returning to the neutral position avoiding misplacement.
 
-\begin{figure}[h]
+\begin{figure}[htp]
     \centering
     \begin{subfigure}[b]{.45\linewidth}
     \includegraphics[width=\linewidth]{basicTree.png}
@@ -179,7 +179,7 @@ The cube is released, and the gripper moves up before returning to the neutral p
     \end{subfigure}
     \caption{The trees in treeviewer.py}
 \end{figure}
-
+\newpage
 \section{Determine table velocity and predicted position}
 By measuring the position two times with a delay inbetween, we can calculate the rotational speed of the object and predict its position after a given peiod.
 This is done whith linear algebra using a third point, the tables center. The center of the table is hardcoded, to avoid using a additional topic for a value that will not change during the simulation. \\
