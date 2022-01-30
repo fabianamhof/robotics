@@ -23,3 +23,7 @@ Since we are estimating the end-effector velocity by moving it and measuring the
 ### Comments for the RBT framework
 We have changed the RBT framework a little for our needs. Now you can specify the type of the ROS Topic in the topics.json file.
 In order to be able to load our Trees (pickUpTree.json, initTree.json,...) you first have to load the basicTreeProject.json, otherwise the rbt-framework throws an error.
+
+Thanks to Stefan Kofler for developing and providing the RBT-framework
+https://git.uibk.ac.at/csat6577/rbt-framework/-/tree/main/python
+

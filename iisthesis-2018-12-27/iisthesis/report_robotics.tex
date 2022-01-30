@@ -115,6 +115,7 @@ We created a few ROS-topics that would be useful:
     \item [gripper\_state] returns if the gripper has grabbed a object or not
     \item [robot\_state] integer which determines the state in which the robot is 
     \item [target\_pos] the position to which the gripper will move
+    \item [endeffector\_pos] feedback from the gripper of its position
 \end{description}
 \noindent
 Firstly we moved the whole control of the arm from the LUA-script to a external python program, keeping only the inverse kinematics.
@@ -122,11 +123,11 @@ After this we could start to work on our suggested improvements.
 
 \section{Reconfigurable behaviour Trees}
 Next the RBT \cite{DBLP:journals/corr/abs-2007-10663}, which was written in python was added. \\
-This allowes to create trees in .json, which control the the arm, instead of using the automata-like system
+This allows to create trees in .json, which control the the arm, instead of using the automata-like system
 from before.
 Building on the code given to us we can program the necessary steps which will then be used by the tree when controlling the arm, e.g. prediction of
 the future position of the cube and its orientation. \\
-The advantage of behaviour trees is the reusability of code the main drawback here is the problmatic integration of control features. \cite{DBLP:journals/corr/abs-2007-10663}
+The advantage of behaviour trees is the reusability of code the main drawback here is the problematic integration of control features. \cite{DBLP:journals/corr/abs-2007-10663}
 This is because control features cannot be read instantly.
 RBT address this issue by implementing parallel nodes witch allow for consistent calls on the our features. \\
 In the following subsections each tree used by the robot will be briefly described:
@@ -135,7 +136,7 @@ In the following subsections each tree used by the robot will be briefly describ
 This tree is the one used to to call the remaining individual trees to perform the grabbing task. Firstly it initializes the blackboard, which in the RBT framework we were provided
 is a container for variables which can be used by multiple nodes to exchange data. The blackboard is also useful when working with ROS-topics, allowing to just put them in a .json file and subscribing them automatically with a python programm.
 Lastly the priorities are handled with the accordingly named node and a tree for each situation is chosen and switched to.
-The handle Pryority action determines which tree should be executed at any time. That specific subtree is then called each time a change in priority was detected. 
+The handlePriority action determines which tree should be executed at any time. That specific subtree is then called each time a change in priority was detected. 
 
 \subsection{Init tree}
 The init tree is called only once and is used to firstly move the arm into a standard position and than perform a calibration movement, in order to get a approximate movement speed. 
@@ -182,8 +183,8 @@ The cube is released, and the gripper moves up before returning to the neutral p
 \end{figure}
 \newpage
 \section{Determine table velocity and predicted position}
-By measuring the position two times with a delay inbetween, we can calculate the rotational speed of the object and predict its position after a given peiod.
-This is done whith linear algebra using a third point, the tables center. The center of the table is hardcoded, to avoid using a additional topic for a value that will not change during the simulation. \\
+By measuring the position two times with a delay in between, we can calculate the rotational speed of the object and predict its position after a given period.
+This is done with linear algebra using a third point, the tables center. The center of the table is hardcoded, to avoid using a additional topic for a value that will not change during the simulation. \\
 The angle is calculated as follows:
 $$
 \theta = \arccos \left ( \frac{\overrightarrow{P_cP_s} \cdot \overrightarrow{P_cP_e}}{\left | \overrightarrow{P_cP_s} \right | * \left | \overrightarrow{P_cP_s} \right |} \right) \\
@@ -192,12 +193,11 @@ $P_c :=$ Center of table \\
 $P_s :=$ Starting point of measurement \\
 $P_e :=$ Endpoint of measurement \\
 
-In order for the predicted position to be accurate the arms movement velocity and its distance from the cube has to be estimated aswell.
+In order for the predicted position to be accurate the arms movement velocity and its distance from the cube has to be estimated as well.
 The last point is quite problematic, in order predict the cubes position we need the time that the arm takes to reach that position and not knowing the position means we can't calculate the travel time, 
-essentially we two unknown variables.
-To circumvent this, the travel time to the cubes last known position is used instead, this means that the arm will arrive at the predicted point before the cube 
-and therefore the gripper will not move in a perfect vertical motion. In practice this did not impact the action but could cause problems if the shape of the object on the table was different.
-Since the same argument could be brought up for a vertical movement we kept this implementation because it does not affect the cube. \\
+essentially we have two unknown variables.
+To circumvent this, the travel time to the cubes last known position is used instead, then we could use this time to calculate the future position of the cube. Although the predicted position is somehow just approximate, in practice this did just slightly impact the grabbing action since the table is moving relatively slow compared to the velocity of the gripper.
+It was harder to get an exact estimation of the gripper speed. Like already mentioned we decided to move the gripper once when starting the program (initTree) and measure the time for a predefined movement. Since the grippers movement speed is not constant (breaking, accelerating) and in addition to that the measurement of the time includes some overheads (communication, ik-calculation,...) we decided to adjust the measured time by multiplying it with 0.7 in the calcArmVelocity node, line 71. This value helped us to compensate overheads and should be changed accordingly if there are problems grabbing the cube.
 With the angle, the delay between measurements and the arms movement speed a position can be predicted using a simple rotational matrix:
 $$
 \theta_{pred} = \frac{\theta}{t_m} * t_t
@@ -220,7 +220,7 @@ When the simulation starts the cube is aligned in a way that allows the arm to g
 on the next round. To avoid this we added the capability for the gripper to rotate and adjust itself to the cubes orientation.
 The orientational coordinates are defined in euler angles and can be passed via a topic using a 3D-vector.
 Euler angles are a set of 3 angles, which define the pitch roll and yaw of an object. In this scenario the yaw is most important, since we can use it to rotate the gripper on its vertical axis.
-The main problem when setting the yaw of the gripper to match the one of the cube was that axis of the robot and the ones of the cube do not start facing the same way, even if the shape of the cube allowes 
+The main problem when setting the yaw of the gripper to match the one of the cube was that axis of the robot and the ones of the cube do not start facing the same way, even if the shape of the cube allows 
 to pick it up when it is laying on the 'wrong face' it is easier to normalize its coordinates so the gripper can be controlled the same regardless which direction the cube faces. 
 Should the cube be flipped for whatever reason between turns the gripper will always move in to grab it from above.
 As a side benefit this means that the gripper avoids unnecessary 180° turns.
